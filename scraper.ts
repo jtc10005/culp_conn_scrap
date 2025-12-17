@@ -5,7 +5,7 @@ import * as path from 'path';
 import neo4j from 'neo4j-driver';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-const envdata = require('env.json');
+
 interface Person {
     id: string;          // e.g., "8512"
     name: string;
@@ -18,6 +18,8 @@ interface Person {
     page?: number;       // pXXXX number
 }
 
+const jsonString = fs.readFileSync('env.json', 'utf8');
+const envdata = JSON.parse(jsonString);
 const NEO4J_URI = envdata.NEO4J_URI;
 const NEO4J_USER = envdata.NEO4J_USER;
 const NEO4J_PASSWORD = envdata.NEO4J_PASSWORD;
