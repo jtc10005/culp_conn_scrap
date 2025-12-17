@@ -5,25 +5,23 @@ import * as path from 'path';
 import neo4j from 'neo4j-driver';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
+const envdata = require('env.json');
 interface Person {
     id: string;          // e.g., "8512"
     name: string;
     birth?: string | undefined;
     death?: string | undefined;
-    notes?: string;
-    parents: string[];   // person IDs
-    spouses: string[];   // person IDs
-    children: string[];  // person IDs
+    notes?: string | undefined;
+    parents: string[] | undefined;   // person IDs
+    spouses: string[] | undefined;   // person IDs
+    children: string[] | undefined;  // person IDs
     page?: number;       // pXXXX number
 }
 
-const NEO4J_URI = 'neo4j+s://547733c6.databases.neo4j.io';
-const NEO4J_USER = 'neo4j';
-const NEO4J_PASSWORD = 'J1HoqaoP4DUAXoKFsfD-OwHG1ParaecsmLPZd1knilw';
-const NEO4J_DATABASE = 'neo4j';
-const AURA_INSTANCEID = '547733c6';
-const AURA_INSTANCENAME = 'Free instance';
+const NEO4J_URI = envdata.NEO4J_URI;
+const NEO4J_USER = envdata.NEO4J_USER;
+const NEO4J_PASSWORD = envdata.NEO4J_PASSWORD;
+
 
 const BASE_URL = 'https://www.culpepperconnections.com/ss/';
 
@@ -61,9 +59,9 @@ const STARTING_POINTS = [
 //checks cache to see if page already downloaded
 async function fetchPage(pageNum: number, anchor: string | undefined): Promise<string> {
     let url = `${BASE_URL}g0/p${pageNum}.htm`;
-    if(anchor){
-        url+=`#${anchor}`;
-    }
+    // if (anchor) {
+    //     url += `#${anchor}`;
+    // }
     const localPath = path.join(DATA_DIR, `p${pageNum}.htm`);
 
     if (visitedPages.has(url) && fs.existsSync(localPath)) {
@@ -113,6 +111,7 @@ async function parseAndSavePerson(pageNum: number, anchor: string) {
 
     const name = personBlock.find('b').first().text().trim().replace(/^\d+\.\s*/, '');
     const fullText = personBlock.text();
+
     const relations = { parents: [] as string[], spouses: [] as string[], children: [] as string[] };
 
     personBlock.find('a[href^="p"]').each((_, el) => {
@@ -153,9 +152,9 @@ async function parseAndSavePerson(pageNum: number, anchor: string) {
         children: relations.children,
         page: pageNum,
     };
-
-    await saveToNeo4j(person);
-    console.log(`Saved: ${person.name} (ID: ${person.id})`);
+    console.log(person);
+    // await saveToNeo4j(person);
+    // console.log(`Saved: ${person.name} (ID: ${person.id})`);
 }
 
 function extractEvent(text: string, keyword: RegExp): string | undefined {
