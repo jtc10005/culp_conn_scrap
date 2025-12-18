@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getNeo4jDriver } from '@/lib/neo4j';
 
 export async function GET() {
@@ -13,7 +13,10 @@ export async function GET() {
          RETURN descendant.id as id, 
                 descendant.name as name,
                 descendant.birth as birth,
+                descendant.death as death,
                 descendant.gender as gender,
+                descendant.birthPlace as birthPlace,
+                descendant.deathPlace as deathPlace,
                 [(descendant)-[:PARENT_OF]->(child:Person) | child.id] as children
          LIMIT 500`
       );
@@ -22,7 +25,10 @@ export async function GET() {
         id: record.get('id'),
         name: record.get('name'),
         birth: record.get('birth') || undefined,
+        death: record.get('death') || undefined,
         gender: record.get('gender') || undefined,
+        birthPlace: record.get('birthPlace') || undefined,
+        deathPlace: record.get('deathPlace') || undefined,
         children: record.get('children'),
       }));
 
