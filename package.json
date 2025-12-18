@@ -12,6 +12,7 @@
     "dev": "cd application && npm run dev",
     "build": "cd application && npm run build",
     "start": "cd application && npm start",
+    "deploy": "cd application && vercel --prod",
     "lint:scraper": "cd scraper && npm run lint",
     "lint:app": "cd application && npm run lint",
     "lint": "npm run lint:scraper && npm run lint:app"
