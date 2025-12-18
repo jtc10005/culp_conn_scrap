@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@models": ["./app/utilities/models/index.ts"],
+      "@functions": ["./app/utilities/functions/index.ts"]
     }
   },
   "include": [

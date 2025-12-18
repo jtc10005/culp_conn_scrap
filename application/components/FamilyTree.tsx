@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { drawTreeIllustration } from './TreeIllustration';
 
 type TreeNode = {
   id: string;
@@ -78,10 +79,15 @@ export default function FamilyTree() {
       d.children?.map((childId) => nodeMap.get(childId)).filter(Boolean) as TreeNode[]
     );
 
-    // Use tree layout with more spacing
+    // Make tree MUCH larger to accommodate family tree nodes
+    const treeScale = 3; // Scale up the tree
+    const treeWidth = width * treeScale;
+    const treeHeight = height * treeScale;
+
+    // Use tree layout with more spacing - SIZE TO MATCH LARGE TREE
     const treeLayout = d3.tree<TreeNode>()
-      .size([height - margin.top - margin.bottom, width - margin.left - margin.right])
-      .separation((a, b) => (a.parent === b.parent ? 1 : 1.2));
+      .size([treeWidth - margin.left - margin.right, treeHeight - margin.top - margin.bottom])
+      .separation((a, b) => (a.parent === b.parent ? 1.5 : 2));
     
     const treeData = treeLayout(hierarchy);
 
@@ -89,6 +95,18 @@ export default function FamilyTree() {
 
     // Track current zoom level
     let currentZoom = 1;
+
+    // Draw decorative tree illustration (background layer) using refactored component
+    const treeIllustration = drawTreeIllustration(g, {
+      treeWidth,
+      treeHeight,
+      showProgenitor: true,
+      progenitorName: 'Henry Culpeper',
+      progenitorSubtitle: 'of Lower Norfolk',
+      onProgenitorClick: () => {
+        window.location.href = '/person/1';
+      },
+    });
 
     // Draw links with smooth curves
     const linkGroup = g.append('g').attr('class', 'links');
@@ -98,14 +116,18 @@ export default function FamilyTree() {
       .append('path')
       .attr('class', 'link')
       .attr('fill', 'none')
-      .attr('stroke', '#cbd5e1')
+      .attr('stroke', '#6b7280')
       .attr('stroke-width', 2)
       .attr('d', (d) => {
-        // Elbow connector
-        return `M${d.source.y},${d.source.x}
-                V${(d.source.x + d.target.x) / 2}
-                H${d.target.y}
-                V${d.target.x}`;
+        // Vertical elbow connector (bottom to top)
+        // Invert Y so tree grows upward (higher Y = lower on screen)
+        const sourceY = treeHeight - d.source.y;
+        const targetY = treeHeight - d.target.y;
+        const midY = (sourceY + targetY) / 2;
+        return `M${d.source.x},${sourceY}
+                V${midY}
+                H${d.target.x}
+                V${targetY}`;
       });
 
     // Draw nodes
@@ -116,7 +138,7 @@ export default function FamilyTree() {
       .enter()
       .append('g')
       .attr('class', 'node')
-      .attr('transform', (d) => `translate(${d.y},${d.x})`)
+      .attr('transform', (d) => `translate(${d.x},${treeHeight - d.y})`)
       .style('cursor', 'pointer')
       .on('click', (event, d) => {
         event.stopPropagation();
@@ -148,7 +170,7 @@ export default function FamilyTree() {
       .attr('text-anchor', 'middle')
       .attr('font-size', '14px')
       .attr('font-weight', '600')
-      .attr('fill', '#1e293b')
+      .attr('fill', '#ffffff')
       .attr('opacity', 0)
       .text((d) => d.data.name);
 
@@ -159,7 +181,7 @@ export default function FamilyTree() {
       .attr('dy', 20)
       .attr('text-anchor', 'middle')
       .attr('font-size', '11px')
-      .attr('fill', '#64748b')
+      .attr('fill', '#d1d5db')
       .attr('opacity', 0)
       .text((d) => {
         const birth = d.data.birth ? d.data.birth.split('-')[0] : '';
@@ -182,18 +204,18 @@ export default function FamilyTree() {
       .attr('y', -30)
       .attr('width', 200)
       .attr('height', 60)
-      .attr('fill', 'white')
-      .attr('stroke', '#cbd5e1')
+      .attr('fill', '#1f2937')
+      .attr('stroke', '#4b5563')
       .attr('stroke-width', 1)
       .attr('rx', 4)
-      .style('filter', 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))');
+      .style('filter', 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))');
 
     detailBox
       .append('text')
       .attr('x', 20)
       .attr('y', -15)
       .attr('font-size', '11px')
-      .attr('fill', '#475569')
+      .attr('fill', '#f3f4f6')
       .text((d) => d.data.birthPlace ? `Born: ${d.data.birthPlace}` : '');
 
     detailBox
@@ -201,7 +223,7 @@ export default function FamilyTree() {
       .attr('x', 20)
       .attr('y', 0)
       .attr('font-size', '11px')
-      .attr('fill', '#475569')
+      .attr('fill', '#f3f4f6')
       .text((d) => d.data.deathPlace ? `Died: ${d.data.deathPlace}` : '');
 
     detailBox
@@ -209,15 +231,27 @@ export default function FamilyTree() {
       .attr('x', 20)
       .attr('y', 15)
       .attr('font-size', '10px')
-      .attr('fill', '#94a3b8')
+      .attr('fill', '#d1d5db')
       .text((d) => `ID: ${d.data.id}`);
 
     // Function to update detail level based on zoom
     function updateDetailLevel(zoomLevel: number) {
-      // Level 1: Just circles (always visible)
+      // Tree illustration fades out as you zoom in (visible when zoomed out)
+      // Fully visible at zoom <= 0.3, fades out by zoom 1.0
+      const treeOpacity = Math.max(0, Math.min(1, (1 - zoomLevel) / 0.7));
+      treeIllustration.attr('opacity', treeOpacity);
+      
+      // Links and nodes fade IN as you zoom (opposite of tree illustration)
+      // Start appearing at zoom 0.3, fully visible by zoom 0.8
+      const familyOpacity = Math.max(0, Math.min(1, (zoomLevel - 0.3) / 0.5));
+      linkGroup.attr('opacity', familyOpacity);
+      
+      // Node circles appear with family tree
+      node.selectAll('.node-circle')
+        .attr('opacity', familyOpacity);
       
       // Level 2: Names appear at zoom >= 0.5
-      nameText.attr('opacity', zoomLevel >= 0.5 ? 1 : 0);
+      nameText.attr('opacity', zoomLevel >= 0.5 ? familyOpacity : 0);
       
       // Level 3: Dates appear at zoom >= 1.5
       datesText.attr('opacity', zoomLevel >= 1.5 ? 1 : 0);
@@ -241,9 +275,9 @@ export default function FamilyTree() {
 
     svg.call(zoom);
 
-    // Initial zoom to fit
-    const initialScale = 0.5;
-    svg.call(zoom.transform, d3.zoomIdentity.translate(100, height / 2).scale(initialScale));
+    // Initial zoom to fit - start zoomed WAY out to see whole tree, centered on bottom (root)
+    const initialScale = 0.2; // Zoom out more to see the large tree
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width / 2, height * 0.9).scale(initialScale));
     currentZoom = initialScale;
 
     // Initialize detail level
@@ -274,10 +308,10 @@ export default function FamilyTree() {
   }
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-slate-50 to-slate-100 relative">
-      <div className="absolute top-0 left-0 right-0 z-10 bg-white/80 backdrop-blur-sm border-b border-slate-200 p-4">
-        <h1 className="text-2xl font-bold text-slate-900">Culpepper Family Tree</h1>
-        <p className="text-sm text-slate-600 mt-1">
+    <div className="w-full h-screen bg-black relative">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-sm border-b border-gray-800 p-4">
+        <h1 className="text-2xl font-bold text-white">Culpepper Family Tree</h1>
+        <p className="text-sm text-gray-400 mt-1">
           🖱️ Click nodes for details • 🔍 Scroll to zoom • ✋ Drag to pan • More details appear as you zoom in
         </p>
       </div>
