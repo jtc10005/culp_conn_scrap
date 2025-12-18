@@ -1,39 +1,25 @@
 {
-  "name": "culp_conn_scrap",
+  "name": "culpepper-genealogy-monorepo",
   "version": "1.0.0",
-  "description": "\"# culp_conn_scrap\"",
-  "homepage": "https://github.com/jtc10005/culp_conn_scrap#readme",
-  "bugs": {
-    "url": "https://github.com/jtc10005/culp_conn_scrap/issues"
+  "private": true,
+  "description": "Monorepo for Culpepper genealogy scraper and website",
+  "scripts": {
+    "install:scraper": "cd scraper && npm install",
+    "install:app": "cd application && npm install",
+    "install:all": "npm run install:scraper && npm run install:app",
+    "scrape": "cd scraper && npm run scrape",
+    "scrape:test": "cd scraper && npm run scrape:test",
+    "dev": "cd application && npm run dev",
+    "build": "cd application && npm run build",
+    "start": "cd application && npm start",
+    "lint:scraper": "cd scraper && npm run lint",
+    "lint:app": "cd application && npm run lint",
+    "lint": "npm run lint:scraper && npm run lint:app"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jtc10005/culp_conn_scrap.git"
+    "url": "https://github.com/jtc10005/culp_conn_scrap.git"
   },
-  "license": "ISC",
   "author": "",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "scrape": "cls && tsx scraper.ts"
-  },
-  "dependencies": {
-    "axios": "^1.13.2",
-    "cheerio": "^1.1.2",
-    "neo4j-driver": "^6.0.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@eslint/json": "^0.14.0",
-    "@types/axios": "^0.9.36",
-    "@types/cheerio": "^0.22.35",
-    "@types/node": "^25.0.3",
-    "eslint": "^9.39.2",
-    "globals": "^16.5.0",
-    "jiti": "^2.6.1",
-    "prettier": "^3.7.4",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0"
-  }
+  "license": "UNLICENSED"
 }
