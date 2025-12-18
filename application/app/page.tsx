@@ -35,6 +35,18 @@ export default function Home() {
               Search and explore all individuals in the database
             </p>
           </a>
+
+          <a
+            href="/practice"
+            className="p-8 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow border border-slate-200"
+          >
+            <h2 className="text-2xl font-semibold text-slate-900 mb-3">
+              🎨 SVG Practice
+            </h2>
+            <p className="text-slate-600">
+              Experimental SVG playground with camera controls
+            </p>
+          </a>
         </div>
 
         <div className="mt-16 text-center text-slate-500 text-sm">
