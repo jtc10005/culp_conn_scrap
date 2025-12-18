@@ -1,0 +1,12 @@
+{
+  "name": "Run scraper",
+  "type": "node",
+  "request": "launch",
+  "program": "${file}",
+  "runtimeExecutable": "tsx",
+  "console": "integratedTerminal",
+  "skipFiles": [
+    "<node_internals>/**",
+    "${workspaceFolder}/node_modules/**"
+  ]
+}
