@@ -38,7 +38,7 @@ export default function Home() {
         </div>
 
         <div className="mt-16 text-center text-slate-500 text-sm">
-          <p>Data sourced from Culpepper Connections</p>
+          <p>Data sourced from <a href="https://culpepperconnections.com">Culpepper Connections</a></p>
         </div>
       </main>
     </div>
