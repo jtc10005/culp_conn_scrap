@@ -5,7 +5,7 @@ import * as path from 'path';
 import neo4j from 'neo4j-driver';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
+import type { AnyNode } from 'domhandler';
 interface Person {
     id: string;          // e.g., "8512"
     name: string;
@@ -59,8 +59,8 @@ const STARTING_POINTS = [
 ];
 
 //checks cache to see if page already downloaded
-async function fetchPage(pageNum: number, anchor: string | undefined): Promise<string> {
-    let url = `${BASE_URL}g0/p${pageNum}.htm`;
+async function fetchPage(pageNum: number): Promise<string> {
+    const url = `${BASE_URL}g0/p${pageNum}.htm`;
     // if (anchor) {
     //     url += `#${anchor}`;
     // }
@@ -82,6 +82,41 @@ async function fetchPage(pageNum: number, anchor: string | undefined): Promise<s
     }
 }
 
+function parseSection(node: cheerio.Cheerio<AnyNode>, id: string): Person | undefined {
+    if (!node) return undefined;
+    if (node) {
+        const name = node.children();
+        const p: Person = {
+            id,
+            name: name.first().text(),
+            parents: [],
+            children: [],
+            spouses: [],
+        };
+
+        const extract = node.extract({
+            name: { selector: 'h2:first' },
+            family: {
+                selector: 'table.ss-family > tbody', value: (el, key) => {
+                    const t = el.childNodes;
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const r = t.forEach(x => console.log(x));
+                    console.log('item', t.length);
+                    return `${key}=${key}`;
+                }
+            }
+
+
+        })
+        console.log(extract);
+        return p;
+        // node.extract({
+        //     people:[
+
+        //     ]
+        // })
+    }
+}
 async function parseAndSavePerson(pageNum: number, anchor: string) {
     // anchor includes the 'i', e.g., "i8512"
     const personId = anchor.replace(/^i/, '');
@@ -89,76 +124,89 @@ async function parseAndSavePerson(pageNum: number, anchor: string) {
     if (visitedPersons.has(personId)) return;
     visitedPersons.add(personId);
 
-    const html = await fetchPage(pageNum, anchor);
+    const html = await fetchPage(pageNum);
     const $ = cheerio.load(html);
 
-    // const personBlock = $(`a[name="${anchor}"]`).closest('tr');
-    // if (personBlock.length === 0) {
+    // //working
+    const parentDiv = $(`#${anchor}`)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const x = parseSection(parentDiv, personId);
+
+
+
+    // console.log(`found: ${parentDiv}`);
+    // const div = $(`.itp`);
+    // console.log('div',div)
+    // // const parentDiv = $(`#{anchor}`);
+    // // console.log(parentDiv);
+    // // const personBlock = $(`a[name="${anchor}"]`).closest('tr');
+    // // if (personBlock.length === 0) {
+    // //     console.warn(`Anchor ${anchor} not found on page ${pageNum}`);
+    // //     return;
+    // // }
+
+    // // const name = personBlock.find('b').first().text().trim().replace(/^\d+\.\s*/, '');
+    // // const fullText = personBlock.text();
+    // const anchorEl = $(`a[name="${anchor}"]`);
+    // if (anchorEl.length === 0) {
     //     console.warn(`Anchor ${anchor} not found on page ${pageNum}`);
     //     return;
+    // }
+    // console.warn('trying fall back');
+    // let personBlock = anchorEl.parents('table').first();
+    // if (personBlock.length === 0) {
+    //     personBlock = anchorEl.parent().parent().parent();
     // }
 
     // const name = personBlock.find('b').first().text().trim().replace(/^\d+\.\s*/, '');
     // const fullText = personBlock.text();
-    const anchorEl = $(`a[name="${anchor}"]`);
-    if (anchorEl.length === 0) {
-        console.warn(`Anchor ${anchor} not found on page ${pageNum}`);
-        return;
-    }
-    console.warn('trying fall back');
-    let personBlock = anchorEl.parents('table').first();
-    if (personBlock.length === 0) {
-        personBlock = anchorEl.parent().parent().parent();
-    }
+    // console.log(`name: ${name}`);
+    // const relations = { parents: [] as string[], spouses: [] as string[], children: [] as string[] };
 
-    const name = personBlock.find('b').first().text().trim().replace(/^\d+\.\s*/, '');
-    const fullText = personBlock.text();
+    // personBlock.find('a[href^="p"]').each((_, el) => {
+    //     const href = $(el).attr('href');
+    //     if (!href) return;
 
-    const relations = { parents: [] as string[], spouses: [] as string[], children: [] as string[] };
+    //     const match = href.match(/p(\d+)\.htm#i(\d+)/);
+    //     if (!match) return;
 
-    personBlock.find('a[href^="p"]').each((_, el) => {
-        const href = $(el).attr('href');
-        if (!href) return;
+    //     const targetPage = parseInt(match[1]!, 10);
+    //     const targetId = match[2];
 
-        const match = href.match(/p(\d+)\.htm#i(\d+)/);
-        if (!match) return;
+    //     const surrounding = $(el).parent().text().toLowerCase();
 
-        const targetPage = parseInt(match[1]!, 10);
-        const targetId = match[2];
+    //     if (surrounding.includes('son of') || surrounding.includes('dau of') || surrounding.includes('child of')) {
+    //         relations.parents.push(targetId!);
+    //     } else if (surrounding.includes('m.') || surrounding.includes('married') || surrounding.includes('spouse')) {
+    //         relations.spouses.push(targetId!);
+    //     } else if (surrounding.includes('children') || $(el).parent().is('ol, ul')) {
+    //         relations.children.push(targetId!);
+    //     } else {
+    //         // fallback: treat as child
+    //         relations.children.push(targetId!);
+    //     }
 
-        const surrounding = $(el).parent().text().toLowerCase();
+    //     // Add to queue for crawling
+    //     queue.push({ page: targetPage, anchor: `i${targetId}` });
+    // });
 
-        if (surrounding.includes('son of') || surrounding.includes('dau of') || surrounding.includes('child of')) {
-            relations.parents.push(targetId!);
-        } else if (surrounding.includes('m.') || surrounding.includes('married') || surrounding.includes('spouse')) {
-            relations.spouses.push(targetId!);
-        } else if (surrounding.includes('children') || $(el).parent().is('ol, ul')) {
-            relations.children.push(targetId!);
-        } else {
-            // fallback: treat as child
-            relations.children.push(targetId!);
-        }
-
-        // Add to queue for crawling
-        queue.push({ page: targetPage, anchor: `i${targetId}` });
-    });
-
-    const person: Person = {
-        id: personId,
-        name,
-        birth: extractEvent(fullText, /born/i),
-        death: extractEvent(fullText, /died/i),
-        notes: fullText.trim(),
-        parents: relations.parents,
-        spouses: relations.spouses,
-        children: relations.children,
-        page: pageNum,
-    };
-    console.log(person);
-    // await saveToNeo4j(person);
-    // console.log(`Saved: ${person.name} (ID: ${person.id})`);
+    // const person: Person = {
+    //     id: personId,
+    //     name,
+    //     birth: extractEvent(fullText, /born/i),
+    //     death: extractEvent(fullText, /died/i),
+    //     notes: fullText.trim(),
+    //     parents: relations.parents,
+    //     spouses: relations.spouses,
+    //     children: relations.children,
+    //     page: pageNum,
+    // };
+    // console.log(person);
+    // // await saveToNeo4j(person);
+    // // console.log(`Saved: ${person.name} (ID: ${person.id})`);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function extractEvent(text: string, keyword: RegExp): string | undefined {
     const match = text.match(keyword);
     if (!match) return undefined;
@@ -168,7 +216,7 @@ function extractEvent(text: string, keyword: RegExp): string | undefined {
     const target = sentences.find(s => keyword.test(s));
     return target ? target.trim() + '.' : undefined;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function saveToNeo4j(person: Person) {
     const session = driver.session();
     console.info('saving');
@@ -194,7 +242,7 @@ async function saveToNeo4j(person: Person) {
         );
 
         // Parents → bidirectional PARENT_OF / CHILD_OF
-        for (const parentId of person.parents) {
+        for (const parentId of person.parents!) {
             await session.run(
                 `
         MATCH (child:Person {id: $childId})
@@ -207,7 +255,7 @@ async function saveToNeo4j(person: Person) {
         }
 
         // Spouses → undirected SPOUSE_OF
-        for (const spouseId of person.spouses) {
+        for (const spouseId of person.spouses!) {
             await session.run(
                 `
         MATCH (p1:Person {id: $id1})
@@ -219,7 +267,7 @@ async function saveToNeo4j(person: Person) {
         }
 
         // Children → same as parents but reversed
-        for (const childId of person.children) {
+        for (const childId of person.children!) {
             await session.run(
                 `
         MATCH (parent:Person {id: $parentId})
