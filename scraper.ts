@@ -12,163 +12,202 @@ const driver = neo4j.driver(
   neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD)
 );
 
-/**
- * Crawl all people starting from a root person
- */
-async function crawl() {
-  console.log('Starting crawl...');
+// Scraper configuration from env.json
+const BATCH_SIZE = config.BATCH_SIZE || 300;
+const SKIP_NEO4J_SAVE = config.SKIP_NEO4J_SAVE !== undefined ? config.SKIP_NEO4J_SAVE : false;
+const MAX_RECORDS = config.MAX_RECORDS || null; // null = no limit
 
-  const people = new Map<string, Person>();
-  const visited = new Set<string>();
-  const queue: QueueItem[] = [{ page: 'p1.htm', anchor: 'i1' }];
-  const pageCache = new Map<string, string>();
-
-  let processed = 0;
-
-  while (queue.length > 0) {
-    const item = queue.shift()!;
-    const key = `${item.page}#${item.anchor}`;
-
-    if (visited.has(key)) continue;
-    visited.add(key);
-
-    // Fetch page (with caching)
-    let html: string;
-    if (pageCache.has(item.page)) {
-      html = pageCache.get(item.page)!;
-    } else {
-      try {
-        console.log(`Fetching ${item.page}...`);
-        const res = await axios.get(`${BASE_URL}${item.page}`);
-        html = res.data;
-        pageCache.set(item.page, html);
-        // Small delay to be respectful to the server
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      } catch (error) {
-        console.error(`Failed to fetch ${item.page}:`, error);
-        continue;
+// COMMENTED OUT FOR TESTING - Uncomment when ready to save to Neo4j
+// Now controlled by SKIP_NEO4J_SAVE in env.json
+async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
+  // Save all person nodes in the batch
+  for (const person of people) {
+    await session.run(
+      `MERGE (p:Person {id: $id})
+       SET p.name = $name,
+           p.firstName = $firstName,
+           p.middleName = $middleName,
+           p.lastName = $lastName,
+           p.gender = $gender,
+           p.birth = $birth,
+           p.birthPlace = $birthPlace,
+           p.death = $death,
+           p.deathPlace = $deathPlace,
+           p.burial = $burial,
+           p.burialPlace = $burialPlace,
+           p.marriageDate = $marriageDate,
+           p.father = $father,
+           p.mother = $mother`,
+      {
+        id: person.id,
+        name: person.name,
+        firstName: person.firstName || null,
+        middleName: person.middleName || null,
+        lastName: person.lastName || null,
+        gender: person.gender || null,
+        birth: person.birth || null,
+        birthPlace: person.birthPlace || null,
+        death: person.death || null,
+        deathPlace: person.deathPlace || null,
+        burial: person.burial || null,
+        burialPlace: person.burialPlace || null,
+        marriageDate: person.marriageDate || null,
+        father: person.father || null,
+        mother: person.mother || null,
       }
-    }
-
-    // Parse person
-    const parsed = parsePersonFromPage(html, item.anchor);
-    if (!parsed) {
-      console.warn(`Person not found: ${key}`);
-      continue;
-    }
-
-    const { person, discovered } = parsed;
-    people.set(person.id, person);
-    processed++;
-
-    const nameInfo = person.firstName && person.lastName 
-      ? ` [${person.firstName} ${person.lastName}]`
-      : '';
-    const birthInfo = person.birth ? ` b:${person.birth}` : '';
-    const birthPlaceInfo = person.birthPlace ? ` @${person.birthPlace}` : '';
-    const deathInfo = person.death ? ` d:${person.death}` : '';
-    const deathPlaceInfo = person.deathPlace ? ` @${person.deathPlace}` : '';
-    
-    console.log(
-      `[${processed}] ${person.name}${nameInfo} (ID: ${person.id})${birthInfo}${birthPlaceInfo}${deathInfo}${deathPlaceInfo} | spouses=${person.spouses.length} children=${person.children.length} | queue=${queue.length}`
     );
-
-    // Add discovered people to queue
-    for (const disc of discovered) {
-      const discKey = `${disc.page}#${disc.anchor}`;
-      if (!visited.has(discKey)) {
-        queue.push(disc);
-      }
-    }
   }
 
-  console.log('\n=== Crawl Complete ===');
-  console.log(`Total people collected: ${people.size}`);
-  console.log(`Total pages fetched: ${pageCache.size}`);
-
-  return people;
-}
-
-/**
- * Save all people and relationships to Neo4j
- */
-async function saveToNeo4j(people: Map<string, Person>) {
-  const session = driver.session({ database: config.NEO4J_DATABASE });
-
-  try {
-    console.log('\n=== Saving to Neo4j ===');
-
-    // Clear existing data
-    console.log('Clearing existing data...');
-    await session.run('MATCH (n) DETACH DELETE n');
-
-    // Create all person nodes
-    console.log(`Creating ${people.size} person nodes...`);
-    for (const [id, person] of people.entries()) {
+  // Save all relationships in the batch
+  for (const person of people) {
+    // MERGE spouse relationships (bidirectional, no duplicates)
+    for (const spouseId of person.spouses) {
       await session.run(
-        `CREATE (p:Person {
-          id: $id, 
-          name: $name, 
-          firstName: $firstName,
-          lastName: $lastName,
-          birth: $birth, 
-          birthPlace: $birthPlace,
-          death: $death,
-          deathPlace: $deathPlace
-        })`,
-        { 
-          id, 
-          name: person.name,
-          firstName: person.firstName || null,
-          lastName: person.lastName || null,
-          birth: person.birth || null,
-          birthPlace: person.birthPlace || null,
-          death: person.death || null,
-          deathPlace: person.deathPlace || null
-        }
+        `MERGE (p1:Person {id: $id1})
+         MERGE (p2:Person {id: $id2})
+         MERGE (p1)-[:SPOUSE]-(p2)`,
+        { id1: person.id, id2: spouseId }
       );
     }
 
-    // Create relationships
-    let spouseRelCount = 0;
-    let childRelCount = 0;
+    // MERGE parent-child relationships from children array (avoids duplicates)
+    for (const childId of person.children) {
+      await session.run(
+        `MERGE (parent:Person {id: $parentId})
+         MERGE (child:Person {id: $childId})
+         MERGE (parent)-[:PARENT_OF]->(child)`,
+        { parentId: person.id, childId }
+      );
+    }
 
-    console.log('Creating relationships...');
-    for (const [id, person] of people.entries()) {
-      // Create SPOUSE relationships
-      for (const spouseId of person.spouses) {
-        if (people.has(spouseId)) {
-          await session.run(
-            `MATCH (p1:Person {id: $id1})
-             MATCH (p2:Person {id: $id2})
-             MERGE (p1)-[:SPOUSE]-(p2)`,
-            { id1: id, id2: spouseId }
-          );
-          spouseRelCount++;
+    // MERGE parent relationships from father/mother fields
+    if (person.father) {
+      await session.run(
+        `MERGE (parent:Person {id: $parentId})
+         MERGE (child:Person {id: $childId})
+         MERGE (parent)-[:PARENT_OF]->(child)`,
+        { parentId: person.father, childId: person.id }
+      );
+    }
+
+    if (person.mother) {
+      await session.run(
+        `MERGE (parent:Person {id: $parentId})
+         MERGE (child:Person {id: $childId})
+         MERGE (parent)-[:PARENT_OF]->(child)`,
+        { parentId: person.mother, childId: person.id }
+      );
+    }
+  }
+}
+
+/**
+ * Crawl all people starting from a root person, saving in batches
+ */
+async function crawl() {
+  console.log('Starting crawl with batch saving...');
+  console.log(`📊 Configuration: BATCH_SIZE=${BATCH_SIZE}, SKIP_NEO4J=${SKIP_NEO4J_SAVE}, MAX_RECORDS=${MAX_RECORDS || 'unlimited'}\n`);
+
+  const session = driver.session({ database: config.NEO4J_DATABASE });
+  const visited = new Set<string>();
+  const queue: QueueItem[] = [{ page: 'p1.htm', anchor: 'i1' }];
+  const pageCache = new Map<string, string>();
+  
+  const batch: Person[] = [];
+  let processed = 0;
+
+  try {
+    while (queue.length > 0 && (MAX_RECORDS === null || processed < MAX_RECORDS)) {
+      const item = queue.shift()!;
+      const key = `${item.page}#${item.anchor}`;
+
+      if (visited.has(key)) continue;
+      visited.add(key);
+
+      // Fetch page (with caching)
+      let html: string;
+      if (pageCache.has(item.page)) {
+        html = pageCache.get(item.page)!;
+      } else {
+        try {
+          console.log(`Fetching ${item.page}...`);
+          const res = await axios.get(`${BASE_URL}${item.page}`);
+          html = res.data;
+          pageCache.set(item.page, html);
+          // Small delay to be respectful to the server
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        } catch (error) {
+          console.error(`Failed to fetch ${item.page}:`, error);
+          continue;
         }
       }
 
-      // Create PARENT_OF relationships
-      for (const childId of person.children) {
-        if (people.has(childId)) {
-          await session.run(
-            `MATCH (parent:Person {id: $parentId})
-             MATCH (child:Person {id: $childId})
-             CREATE (parent)-[:PARENT_OF]->(child)`,
-            { parentId: id, childId }
-          );
-          childRelCount++;
+      // Parse person
+      const parsed = parsePersonFromPage(html, item.anchor);
+      if (!parsed) {
+        console.warn(`Person not found: ${key}`);
+        continue;
+      }
+
+      const { person, discovered } = parsed;
+      
+      // Add to batch
+      batch.push(person);
+      processed++;
+
+      const nameInfo = person.firstName && person.lastName 
+        ? ` [${person.firstName}${person.middleName ? ' ' + person.middleName : ''} ${person.lastName}]`
+        : '';
+      const genderInfo = person.gender ? ` ${person.gender}` : '';
+      const birthInfo = person.birth ? ` b:${person.birth}` : '';
+      const birthPlaceInfo = person.birthPlace ? ` @${person.birthPlace}` : '';
+      const deathInfo = person.death ? ` d:${person.death}` : '';
+      const deathPlaceInfo = person.deathPlace ? ` @${person.deathPlace}` : '';
+      const burialInfo = person.burial ? ` buried:${person.burial}` : '';
+      const marriageInfo = person.marriageDate ? ` m:${person.marriageDate}` : '';
+      const parentsInfo = person.father || person.mother 
+        ? ` parents:${person.father || '?'}+${person.mother || '?'}` 
+        : '';
+      
+      console.log(
+        `[${processed}] ${person.name}${nameInfo}${genderInfo} (ID: ${person.id})${birthInfo}${birthPlaceInfo}${deathInfo}${deathPlaceInfo}${burialInfo}${marriageInfo}${parentsInfo} | spouses=${person.spouses.length} children=${person.children.length} | queue=${queue.length} | batch=${batch.length}`
+      );
+
+      // Save batch when it reaches BATCH_SIZE
+      if (batch.length >= BATCH_SIZE) {
+        if (SKIP_NEO4J_SAVE) {
+          console.log(`\n💾 Skipping save of ${batch.length} people (SKIP_NEO4J_SAVE=true)\n`);
+        } else {
+          console.log(`\n💾 Saving batch of ${batch.length} people to Neo4j...`);
+          await saveBatchToNeo4j(session, batch);
+          console.log('✓ Batch saved\n');
+        }
+        batch.length = 0; // Clear batch
+      }
+
+      // Add discovered people to queue
+      for (const disc of discovered) {
+        const discKey = `${disc.page}#${disc.anchor}`;
+        if (!visited.has(discKey)) {
+          queue.push(disc);
         }
       }
     }
 
-    console.log(`\n✓ Created ${people.size} person nodes`);
-    console.log(`✓ Created ${spouseRelCount} spouse relationships`);
-    console.log(`✓ Created ${childRelCount} parent-child relationships`);
-    console.log('\n=== Neo4j Save Complete ===');
-  } catch (error) {
-    console.error('Error saving to Neo4j:', error);
-    throw error;
+    // Save any remaining people in the final batch
+    if (batch.length > 0) {
+      if (SKIP_NEO4J_SAVE) {
+        console.log(`\n💾 Skipping final batch of ${batch.length} people (SKIP_NEO4J_SAVE=true)`);
+      } else {
+        console.log(`\n💾 Saving final batch of ${batch.length} people to Neo4j...`);
+        await saveBatchToNeo4j(session, batch);
+        console.log('✓ Final batch saved');
+      }
+    }
+
+    console.log('\n=== Crawl Complete ===');
+    console.log(`Total people processed: ${processed}${MAX_RECORDS ? ` (limited to ${MAX_RECORDS})` : ''}`);
+    console.log(`Total pages fetched: ${pageCache.size}`);
   } finally {
     await session.close();
   }
@@ -176,8 +215,12 @@ async function saveToNeo4j(people: Map<string, Person>) {
 
 async function main() {
   try {
-    const people = await crawl();
-    await saveToNeo4j(people);
+    await crawl();
+    if (SKIP_NEO4J_SAVE) {
+      console.log('\n✓ Crawl complete (Neo4j saving was skipped)');
+    } else {
+      console.log('\n✓ All data saved to Neo4j');
+    }
   } catch (error) {
     console.error('Error:', error);
   } finally {
