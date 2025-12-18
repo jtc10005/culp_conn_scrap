@@ -1,1 +1,2 @@
-export * from './click-zoom';
+export * from './clickZoom';
+export* from './animateZoom';
