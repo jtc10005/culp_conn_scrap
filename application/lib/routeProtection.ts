@@ -8,7 +8,7 @@ import { ReactElement } from 'react';
  */
 export async function checkRouteAccess(routeKey: keyof NavigationConfig): Promise<void> {
   const navConfig = await getNavigationConfig();
-  
+
   if (!navConfig[routeKey]) {
     notFound();
   }
