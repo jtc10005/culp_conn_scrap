@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getNeo4jDriver } from '@/lib/neo4j';
+import { getNeo4jDriver } from '@/lib';
 
 export async function GET() {
   try {
@@ -38,9 +38,6 @@ export async function GET() {
     }
   } catch (error) {
     console.error('Error fetching tree:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch tree' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch tree' }, { status: 500 });
   }
 }

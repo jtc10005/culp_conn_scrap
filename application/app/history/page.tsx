@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { checkRouteAccess } from '@lib';
 
 export const metadata = {
   title: 'Culpepper Family History - Culpepper.Info',
@@ -7,7 +8,8 @@ export const metadata = {
     'The history of the Culpepper family in America, tracing back to Henry Culpeper of Lower Norfolk County, Virginia (circa 1633)',
 };
 
-export default function HistoryPage() {
+export default async function HistoryPage() {
+  await checkRouteAccess('history');
   return (
     <div className="min-h-screen theme-bg-primary theme-text-primary">
       <div className="max-w-6xl mx-auto px-4 py-12">

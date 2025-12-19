@@ -20,8 +20,10 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@models": ["./app/utilities/models/index.ts"],
-      "@functions": ["./app/utilities/functions/index.ts"]
+      "@components": ["./components/index.ts"],
+      "@lib": ["./lib/index.ts"],
+      "@models": ["./lib/models/index.ts"],
+      "@functions": ["./lib/functions/index.ts"]
     }
   },
   "include": [

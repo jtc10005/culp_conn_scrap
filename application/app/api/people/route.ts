@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getNeo4jDriver } from '@/lib/neo4j';
-import { Person } from '@/lib/types';
+import { getNeo4jDriver, Person } from '@/lib';
+import neo4j from 'neo4j-driver';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const limit = parseInt(searchParams.get('limit') || '100');
+  const limitParam = parseInt(searchParams.get('limit') || '10000'); // Default to high limit
+  const limit = neo4j.int(limitParam); // Convert to Neo4j integer type
   const search = searchParams.get('search') || '';
 
   try {
@@ -17,10 +18,18 @@ export async function GET(request: NextRequest) {
            WHERE p.name CONTAINS $search 
               OR p.firstName CONTAINS $search 
               OR p.lastName CONTAINS $search
+              OR p.birthPlace CONTAINS $search
+              OR p.deathPlace CONTAINS $search
            RETURN p
+           ORDER BY 
+             CASE WHEN p.lastName IS NOT NULL THEN p.lastName ELSE p.name END,
+             CASE WHEN p.firstName IS NOT NULL THEN p.firstName ELSE '' END
            LIMIT $limit`
         : `MATCH (p:Person)
            RETURN p
+           ORDER BY 
+             CASE WHEN p.lastName IS NOT NULL THEN p.lastName ELSE p.name END,
+             CASE WHEN p.firstName IS NOT NULL THEN p.firstName ELSE '' END
            LIMIT $limit`;
 
       const result = await session.run(query, { search, limit });
@@ -54,9 +63,6 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error fetching people:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch people' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch people' }, { status: 500 });
   }
 }

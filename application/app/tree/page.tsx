@@ -1,5 +1,7 @@
-import FamilyTree from '@/components/FamilyTree';
+import { FamilyTree } from '@/components';
+import { checkRouteAccess } from '@lib';
 
-export default function TreePage() {
+export default async function TreePage() {
+  await checkRouteAccess('tree');
   return <FamilyTree />;
 }

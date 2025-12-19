@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getNeo4jDriver } from '@/lib/neo4j';
-import { Person } from '@/lib/types';
+import { getNeo4jDriver, Person } from '@/lib';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
@@ -59,9 +55,6 @@ export async function GET(
     }
   } catch (error) {
     console.error('Error fetching person:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch person' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch person' }, { status: 500 });
   }
 }

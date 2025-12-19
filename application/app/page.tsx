@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import { getNavigationConfig } from '@/lib';
 
-export default function Home() {
+export default async function Home() {
+  const navConfig = await getNavigationConfig();
   return (
     <div className="min-h-screen theme-bg-primary">
       <main className="container mx-auto px-4 py-12">
@@ -24,53 +26,67 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <a
-            href="/tree"
-            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
-          >
-            <h2 className="text-2xl font-semibold theme-text-primary mb-3">🌳 Family Tree</h2>
-            <p className="theme-text-secondary">
-              Interactive visualization of the Culpepper family tree
-            </p>
-          </a>
+          {navConfig.tree && (
+            <a
+              href="/tree"
+              className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+            >
+              <h2 className="text-2xl font-semibold theme-text-primary mb-3">🌳 Family Tree</h2>
+              <p className="theme-text-secondary">
+                Interactive visualization of the Culpepper family tree
+              </p>
+            </a>
+          )}
 
-          <a
-            href="/history"
-            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
-          >
-            <h2 className="text-2xl font-semibold theme-text-primary mb-3">📜 Family History</h2>
-            <p className="theme-text-secondary">
-              Discover the rich history of the Culpepper family from England to Virginia
-            </p>
-          </a>
+          {navConfig.history && (
+            <a
+              href="/history"
+              className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+            >
+              <h2 className="text-2xl font-semibold theme-text-primary mb-3">📜 Family History</h2>
+              <p className="theme-text-secondary">
+                Discover the rich history of the Culpepper family from England to Virginia
+              </p>
+            </a>
+          )}
 
-          <a
-            href="/people"
-            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
-          >
-            <h2 className="text-2xl font-semibold theme-text-primary mb-3">👥 Browse People</h2>
-            <p className="theme-text-secondary">
-              Search and explore all individuals in the database
-            </p>
-          </a>
+          {navConfig.people && (
+            <a
+              href="/people"
+              className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+            >
+              <h2 className="text-2xl font-semibold theme-text-primary mb-3">👥 Browse People</h2>
+              <p className="theme-text-secondary">
+                Search and explore all individuals in the database
+              </p>
+            </a>
+          )}
 
-          <a
-            href="/acknowledgements"
-            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
-          >
-            <h2 className="text-2xl font-semibold theme-text-primary mb-3">🙏 Acknowledgements</h2>
-            <p className="theme-text-secondary">
-              Credits and gratitude to those who preserved our family history
-            </p>
-          </a>
+          {navConfig.acknowledgements && (
+            <a
+              href="/acknowledgements"
+              className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+            >
+              <h2 className="text-2xl font-semibold theme-text-primary mb-3">
+                🙏 Acknowledgements
+              </h2>
+              <p className="theme-text-secondary">
+                Credits and gratitude to those who preserved our family history
+              </p>
+            </a>
+          )}
 
-          <a
-            href="/practice"
-            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
-          >
-            <h2 className="text-2xl font-semibold theme-text-primary mb-3">🎨 SVG Practice</h2>
-            <p className="theme-text-secondary">Experimental SVG playground with camera controls</p>
-          </a>
+          {navConfig.practice && (
+            <a
+              href="/practice"
+              className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+            >
+              <h2 className="text-2xl font-semibold theme-text-primary mb-3">🎨 SVG Practice</h2>
+              <p className="theme-text-secondary">
+                Experimental SVG playground with camera controls
+              </p>
+            </a>
+          )}
         </div>
 
         <div className="mt-16 text-center theme-text-tertiary text-sm">

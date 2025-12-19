@@ -1,12 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { checkRouteAccess } from '@lib';
 
 export const metadata = {
   title: 'Acknowledgements - Culpepper.Info',
   description: 'Credits and acknowledgements for the Culpepper family genealogy project',
 };
 
-export default function AcknowledgementsPage() {
+export default async function AcknowledgementsPage() {
+  await checkRouteAccess('acknowledgements');
   return (
     <div className="min-h-screen theme-bg-primary theme-text-primary">
       <div className="max-w-4xl mx-auto px-4 py-12">
