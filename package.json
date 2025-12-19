@@ -8,6 +8,7 @@
     "install:app": "cd application && npm install",
     "install:all": "npm run install:scraper && npm run install:app",
     "scrape": "cd scraper && npm run scrape",
+    "find-missing": "cd scraper && npm run find-missing",
     "scrape:test": "cd scraper && npm run scrape:test",
     "dev": "cd application && npm run dev",
     "build": "cd application && npm run build",

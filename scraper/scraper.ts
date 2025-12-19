@@ -1,12 +1,12 @@
-import axios from 'axios';
-import neo4j from 'neo4j-driver';
-import * as fs from 'fs';
-import { parsePersonFromPage, type Person, type QueueItem } from './utils.js';
+import axios from "axios";
+import neo4j from "neo4j-driver";
+import * as fs from "fs";
+import { parsePersonFromPage, type Person, type QueueItem } from "./utils.js";
 
-const BASE_URL = 'https://www.culpepperconnections.com/ss/g0/';
+const BASE_URL = "https://www.culpepperconnections.com/ss/g0/";
 
 // Load Neo4j configuration
-const config = JSON.parse(fs.readFileSync('./env.json', 'utf-8'));
+const config = JSON.parse(fs.readFileSync("./env.json", "utf-8"));
 const driver = neo4j.driver(
   config.NEO4J_URI,
   neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD)
@@ -14,8 +14,17 @@ const driver = neo4j.driver(
 
 // Scraper configuration from env.json
 const BATCH_SIZE = config.BATCH_SIZE || 300;
-const SKIP_NEO4J_SAVE = config.SKIP_NEO4J_SAVE !== undefined ? config.SKIP_NEO4J_SAVE : false;
+const SKIP_NEO4J_SAVE =
+  config.SKIP_NEO4J_SAVE !== undefined ? config.SKIP_NEO4J_SAVE : false;
 const MAX_RECORDS = config.MAX_RECORDS || null; // null = no limit
+const SAVE_HTML = config.SAVE_HTML !== undefined ? config.SAVE_HTML : true; // Save HTML files by default
+
+// Create data directory if it doesn't exist
+const DATA_DIR = "./data";
+if (SAVE_HTML && !fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  console.log(`Created data directory: ${DATA_DIR}`);
+}
 
 // COMMENTED OUT FOR TESTING - Uncomment when ready to save to Neo4j
 // Now controlled by SKIP_NEO4J_SAVE in env.json
@@ -105,19 +114,24 @@ async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
  * Crawl all people starting from a root person, saving in batches
  */
 async function crawl() {
-  console.log('Starting crawl with batch saving...');
-  console.log(`📊 Configuration: BATCH_SIZE=${BATCH_SIZE}, SKIP_NEO4J=${SKIP_NEO4J_SAVE}, MAX_RECORDS=${MAX_RECORDS || 'unlimited'}\n`);
+  console.log("Starting crawl with batch saving...");
+  console.log(
+    `📊 Configuration: BATCH_SIZE=${BATCH_SIZE}, SKIP_NEO4J=${SKIP_NEO4J_SAVE}, MAX_RECORDS=${MAX_RECORDS || "unlimited"}, SAVE_HTML=${SAVE_HTML}\n`
+  );
 
   const session = driver.session({ database: config.NEO4J_DATABASE });
   const visited = new Set<string>();
-  const queue: QueueItem[] = [{ page: 'p1.htm', anchor: 'i1' }];
+  const queue: QueueItem[] = [{ page: "p1.htm", anchor: "i1" }];
   const pageCache = new Map<string, string>();
-  
+
   const batch: Person[] = [];
   let processed = 0;
 
   try {
-    while (queue.length > 0 && (MAX_RECORDS === null || processed < MAX_RECORDS)) {
+    while (
+      queue.length > 0 &&
+      (MAX_RECORDS === null || processed < MAX_RECORDS)
+    ) {
       const item = queue.shift()!;
       const key = `${item.page}#${item.anchor}`;
 
@@ -134,6 +148,14 @@ async function crawl() {
           const res = await axios.get(`${BASE_URL}${item.page}`);
           html = res.data;
           pageCache.set(item.page, html);
+
+          // Save HTML file if enabled
+          if (SAVE_HTML) {
+            const filePath = `${DATA_DIR}/${item.page}`;
+            fs.writeFileSync(filePath, html, "utf-8");
+            console.log(`  💾 Saved ${filePath}`);
+          }
+
           // Small delay to be respectful to the server
           await new Promise((resolve) => setTimeout(resolve, 100));
         } catch (error) {
@@ -150,25 +172,29 @@ async function crawl() {
       }
 
       const { person, discovered } = parsed;
-      
+
       // Add to batch
       batch.push(person);
       processed++;
 
-      const nameInfo = person.firstName && person.lastName 
-        ? ` [${person.firstName}${person.middleName ? ' ' + person.middleName : ''} ${person.lastName}]`
-        : '';
-      const genderInfo = person.gender ? ` ${person.gender}` : '';
-      const birthInfo = person.birth ? ` b:${person.birth}` : '';
-      const birthPlaceInfo = person.birthPlace ? ` @${person.birthPlace}` : '';
-      const deathInfo = person.death ? ` d:${person.death}` : '';
-      const deathPlaceInfo = person.deathPlace ? ` @${person.deathPlace}` : '';
-      const burialInfo = person.burial ? ` buried:${person.burial}` : '';
-      const marriageInfo = person.marriageDate ? ` m:${person.marriageDate}` : '';
-      const parentsInfo = person.father || person.mother 
-        ? ` parents:${person.father || '?'}+${person.mother || '?'}` 
-        : '';
-      
+      const nameInfo =
+        person.firstName && person.lastName
+          ? ` [${person.firstName}${person.middleName ? " " + person.middleName : ""} ${person.lastName}]`
+          : "";
+      const genderInfo = person.gender ? ` ${person.gender}` : "";
+      const birthInfo = person.birth ? ` b:${person.birth}` : "";
+      const birthPlaceInfo = person.birthPlace ? ` @${person.birthPlace}` : "";
+      const deathInfo = person.death ? ` d:${person.death}` : "";
+      const deathPlaceInfo = person.deathPlace ? ` @${person.deathPlace}` : "";
+      const burialInfo = person.burial ? ` buried:${person.burial}` : "";
+      const marriageInfo = person.marriageDate
+        ? ` m:${person.marriageDate}`
+        : "";
+      const parentsInfo =
+        person.father || person.mother
+          ? ` parents:${person.father || "?"}+${person.mother || "?"}`
+          : "";
+
       console.log(
         `[${processed}] ${person.name}${nameInfo}${genderInfo} (ID: ${person.id})${birthInfo}${birthPlaceInfo}${deathInfo}${deathPlaceInfo}${burialInfo}${marriageInfo}${parentsInfo} | spouses=${person.spouses.length} children=${person.children.length} | queue=${queue.length} | batch=${batch.length}`
       );
@@ -176,11 +202,15 @@ async function crawl() {
       // Save batch when it reaches BATCH_SIZE
       if (batch.length >= BATCH_SIZE) {
         if (SKIP_NEO4J_SAVE) {
-          console.log(`\n💾 Skipping save of ${batch.length} people (SKIP_NEO4J_SAVE=true)\n`);
+          console.log(
+            `\n💾 Skipping save of ${batch.length} people (SKIP_NEO4J_SAVE=true)\n`
+          );
         } else {
-          console.log(`\n💾 Saving batch of ${batch.length} people to Neo4j...`);
+          console.log(
+            `\n💾 Saving batch of ${batch.length} people to Neo4j...`
+          );
           await saveBatchToNeo4j(session, batch);
-          console.log('✓ Batch saved\n');
+          console.log("✓ Batch saved\n");
         }
         batch.length = 0; // Clear batch
       }
@@ -197,16 +227,22 @@ async function crawl() {
     // Save any remaining people in the final batch
     if (batch.length > 0) {
       if (SKIP_NEO4J_SAVE) {
-        console.log(`\n💾 Skipping final batch of ${batch.length} people (SKIP_NEO4J_SAVE=true)`);
+        console.log(
+          `\n💾 Skipping final batch of ${batch.length} people (SKIP_NEO4J_SAVE=true)`
+        );
       } else {
-        console.log(`\n💾 Saving final batch of ${batch.length} people to Neo4j...`);
+        console.log(
+          `\n💾 Saving final batch of ${batch.length} people to Neo4j...`
+        );
         await saveBatchToNeo4j(session, batch);
-        console.log('✓ Final batch saved');
+        console.log("✓ Final batch saved");
       }
     }
 
-    console.log('\n=== Crawl Complete ===');
-    console.log(`Total people processed: ${processed}${MAX_RECORDS ? ` (limited to ${MAX_RECORDS})` : ''}`);
+    console.log("\n=== Crawl Complete ===");
+    console.log(
+      `Total people processed: ${processed}${MAX_RECORDS ? ` (limited to ${MAX_RECORDS})` : ""}`
+    );
     console.log(`Total pages fetched: ${pageCache.size}`);
   } finally {
     await session.close();
@@ -217,12 +253,12 @@ async function main() {
   try {
     await crawl();
     if (SKIP_NEO4J_SAVE) {
-      console.log('\n✓ Crawl complete (Neo4j saving was skipped)');
+      console.log("\n✓ Crawl complete (Neo4j saving was skipped)");
     } else {
-      console.log('\n✓ All data saved to Neo4j');
+      console.log("\n✓ All data saved to Neo4j");
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   } finally {
     await driver.close();
   }

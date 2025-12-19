@@ -23,9 +23,12 @@ type Person = {
 
 async function getPerson(id: string): Promise<Person | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/person/${id}`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/person/${id}`,
+      {
+        cache: 'no-store',
+      }
+    );
     if (!res.ok) return null;
     const data = await res.json();
     return data.person;
@@ -34,11 +37,7 @@ async function getPerson(id: string): Promise<Person | null> {
   }
 }
 
-export default async function PersonPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function PersonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const person = await getPerson(id);
 
@@ -67,7 +66,9 @@ export default async function PersonPage({
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-4 theme-text-primary">Personal Information</h2>
+              <h2 className="text-2xl font-semibold mb-4 theme-text-primary">
+                Personal Information
+              </h2>
               <dl className="space-y-2">
                 {person.gender && (
                   <div>
@@ -113,7 +114,7 @@ export default async function PersonPage({
 
             <div>
               <h2 className="text-2xl font-semibold mb-4 theme-text-primary">Relationships</h2>
-              
+
               {(person.father || person.mother) && (
                 <div className="mb-4">
                   <h3 className="font-medium theme-text-secondary mb-2">Parents:</h3>
@@ -170,10 +171,7 @@ export default async function PersonPage({
                   <ul className="space-y-1">
                     {person.children.map((childId) => (
                       <li key={childId}>
-                        <Link
-                          href={`/person/${childId}`}
-                          className="text-blue-600 hover:underline"
-                        >
+                        <Link href={`/person/${childId}`} className="text-blue-600 hover:underline">
                           Child (ID: {childId})
                         </Link>
                       </li>

@@ -35,12 +35,32 @@ export default function Home() {
           </a>
 
           <a
+            href="/history"
+            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+          >
+            <h2 className="text-2xl font-semibold theme-text-primary mb-3">📜 Family History</h2>
+            <p className="theme-text-secondary">
+              Discover the rich history of the Culpepper family from England to Virginia
+            </p>
+          </a>
+
+          <a
             href="/people"
             className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
           >
             <h2 className="text-2xl font-semibold theme-text-primary mb-3">👥 Browse People</h2>
             <p className="theme-text-secondary">
               Search and explore all individuals in the database
+            </p>
+          </a>
+
+          <a
+            href="/acknowledgements"
+            className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+          >
+            <h2 className="text-2xl font-semibold theme-text-primary mb-3">🙏 Acknowledgements</h2>
+            <p className="theme-text-secondary">
+              Credits and gratitude to those who preserved our family history
             </p>
           </a>
 

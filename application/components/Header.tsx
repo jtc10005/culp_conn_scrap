@@ -55,10 +55,22 @@ export default function Header() {
               Family Tree
             </Link>
             <Link
+              href="/history"
+              className="theme-banner-text theme-banner-text-hover transition-colors font-medium"
+            >
+              History
+            </Link>
+            <Link
               href="/people"
               className="theme-banner-text theme-banner-text-hover transition-colors font-medium"
             >
-              Browse People
+              People
+            </Link>
+            <Link
+              href="/acknowledgements"
+              className="theme-banner-text theme-banner-text-hover transition-colors font-medium"
+            >
+              Credits
             </Link>
           </nav>
 

@@ -15,7 +15,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "scrape": "cls && tsx scraper.ts"
+    "scrape": "cls && tsx scraper.ts",
+    "find-missing": "cls && tsx find-missing.ts"
   },
   "dependencies": {
     "axios": "^1.13.2",
