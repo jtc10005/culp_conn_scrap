@@ -63,6 +63,14 @@ export default function FamilyTree() {
     const height = container?.clientHeight || 900;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
+    // Get computed theme colors
+    const computedStyle = getComputedStyle(document.documentElement);
+    const textPrimary = computedStyle.getPropertyValue('--text-primary').trim();
+    const textSecondary = computedStyle.getPropertyValue('--text-secondary').trim();
+    const textTertiary = computedStyle.getPropertyValue('--text-tertiary').trim();
+    const bgSecondary = computedStyle.getPropertyValue('--bg-secondary').trim();
+    const border = computedStyle.getPropertyValue('--border-dark').trim();
+
     const svg = d3
       .select(svgRef.current)
       .attr('width', width)
@@ -107,7 +115,7 @@ export default function FamilyTree() {
       .append('path')
       .attr('class', 'link')
       .attr('fill', 'none')
-      .attr('stroke', '#6b7280')
+      .attr('stroke', textTertiary)
       .attr('stroke-width', 2)
       .attr('d', (d) => {
         // Horizontal elbow connector (left to right)
@@ -158,7 +166,7 @@ export default function FamilyTree() {
       .attr('text-anchor', 'middle')
       .attr('font-size', '14px')
       .attr('font-weight', '600')
-      .attr('fill', '#1f2937')
+      .attr('fill', textPrimary)
       .attr('opacity', 0)
       .text((d) => d.data.name);
 
@@ -169,7 +177,7 @@ export default function FamilyTree() {
       .attr('dy', 20)
       .attr('text-anchor', 'middle')
       .attr('font-size', '11px')
-      .attr('fill', '#4b5563')
+      .attr('fill', textSecondary)
       .attr('opacity', 0)
       .text((d) => {
         const birth = d.data.birth ? d.data.birth.split('-')[0] : '';
@@ -189,8 +197,8 @@ export default function FamilyTree() {
       .attr('y', -30)
       .attr('width', 200)
       .attr('height', 60)
-      .attr('fill', '#ffffff')
-      .attr('stroke', '#d1d5db')
+      .attr('fill', bgSecondary)
+      .attr('stroke', border)
       .attr('stroke-width', 1)
       .attr('rx', 4)
       .style('filter', 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))');
@@ -200,7 +208,7 @@ export default function FamilyTree() {
       .attr('x', 20)
       .attr('y', -15)
       .attr('font-size', '11px')
-      .attr('fill', '#1f2937')
+      .attr('fill', textPrimary)
       .text((d) => (d.data.birthPlace ? `Born: ${d.data.birthPlace}` : ''));
 
     detailBox
@@ -208,7 +216,7 @@ export default function FamilyTree() {
       .attr('x', 20)
       .attr('y', 0)
       .attr('font-size', '11px')
-      .attr('fill', '#1f2937')
+      .attr('fill', textPrimary)
       .text((d) => (d.data.deathPlace ? `Died: ${d.data.deathPlace}` : ''));
 
     detailBox
@@ -216,7 +224,7 @@ export default function FamilyTree() {
       .attr('x', 20)
       .attr('y', 15)
       .attr('font-size', '10px')
-      .attr('fill', '#6b7280')
+      .attr('fill', textTertiary)
       .text((d) => `ID: ${d.data.id}`);
 
     // Function to update detail level based on zoom
@@ -266,32 +274,47 @@ export default function FamilyTree() {
     }
   }, [treeData]);
 
+  // Re-render tree when theme changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      if (treeData.length > 0 && svgRef.current) {
+        renderTree(treeData);
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, [treeData]);
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-xl">Loading family tree...</div>
+      <div className="flex items-center justify-center h-screen theme-bg-primary">
+        <div className="text-xl theme-text-primary">Loading family tree...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-xl text-red-600">Error: {error}</div>
+      <div className="flex items-center justify-center h-screen theme-bg-primary">
+        <div className="text-xl text-red-600 dark:text-red-400">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-screen bg-gray-50 relative">
-      <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900">Culpepper Family Tree</h1>
-        <p className="text-sm text-gray-600 mt-1">
+    <div className="w-full h-screen theme-bg-primary relative">
+      <div className="absolute top-0 left-0 right-0 z-10 theme-bg-secondary/90 backdrop-blur-sm theme-border border-b p-3 theme-shadow-sm">
+        <p className="text-sm theme-text-secondary">
           🖱️ Click nodes for details • 🔍 Scroll to zoom • ✋ Drag to pan • More details appear as
           you zoom in
         </p>
       </div>
-      <div className="w-full h-full pt-20">
+      <div className="w-full h-full pt-12">
         <svg ref={svgRef} className="w-full h-full"></svg>
       </div>
     </div>

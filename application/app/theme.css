@@ -1,0 +1,123 @@
+/* Theme Configuration Variables */
+/* Customize your light and dark themes by changing these values */
+
+:root {
+  /* Light theme colors (default) */
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --border: #e5e7eb;
+  --border-dark: #d1d5db;
+
+  /* Banner colors */
+  --banner-bg-start: #2563eb;
+  --banner-bg-end: #1d4ed8;
+  --banner-border: #1e40af;
+  --banner-text: #ffffff;
+  --banner-text-hover: #dbeafe;
+
+  /* Accent colors (shared across themes) */
+  --accent-blue: #3b82f6;
+  --accent-pink: #ec4899;
+  --accent-gray: #94a3b8;
+  --accent-green: #4caf50;
+
+  /* Shadow values */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode overrides */
+.dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-tertiary: #d1d5db;
+  --border: #374151;
+  --border-dark: #4b5563;
+
+  /* Banner colors for dark mode */
+  --banner-bg-start: #1e3a8a;
+  --banner-bg-end: #1e40af;
+  --banner-border: #1e40af;
+  --banner-text: #f0f9ff;
+  --banner-text-hover: #bfdbfe;
+
+  /* Darker shadows for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Utility classes for easy theming */
+.theme-bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.theme-bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.theme-border {
+  border-color: var(--border);
+}
+
+.theme-border-dark {
+  border-color: var(--border-dark);
+}
+
+.theme-shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-shadow {
+  box-shadow: var(--shadow);
+}
+
+.theme-shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.theme-shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.theme-banner-bg {
+  background: linear-gradient(to right, var(--banner-bg-start), var(--banner-bg-end));
+}
+
+.theme-banner-border {
+  border-color: var(--banner-border);
+}
+
+.theme-banner-text {
+  color: var(--banner-text);
+}
+
+.theme-banner-text-hover:hover {
+  color: var(--banner-text-hover);
+}
