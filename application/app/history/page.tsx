@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { checkRouteAccess } from '@lib';
+import { checkRouteAccess, getNavigationConfig } from '@lib';
 
 export const metadata = {
   title: 'Culpepper Family History - Culpepper.Info',
@@ -10,6 +10,8 @@ export const metadata = {
 
 export default async function HistoryPage() {
   await checkRouteAccess('history');
+  const navConfig = await getNavigationConfig();
+
   return (
     <div className="min-h-screen theme-bg-primary theme-text-primary">
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -178,7 +180,7 @@ export default async function HistoryPage() {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-blue-900 bg-opacity-20 rounded theme-border border border-blue-700">
+              <div className="mt-6 p-4 theme-bg-tertiary rounded theme-border border">
                 <h4 className="font-semibold theme-text-primary mb-2">DNA Evidence</h4>
                 <p className="text-sm leading-relaxed">
                   DNA testing has shown that while American Culpeppers descend from Henry of Lower
@@ -319,7 +321,7 @@ export default async function HistoryPage() {
                     </span>
                   </li>
                 </ul>
-                <div className="mt-6 p-4 bg-green-900 bg-opacity-20 rounded theme-border border border-green-700">
+                <div className="mt-6 p-4 theme-bg-tertiary rounded theme-border border">
                   <p className="text-sm leading-relaxed theme-text-secondary">
                     This DNA evidence, combined with traditional genealogical research, has provided
                     unprecedented clarity about family relationships and confirmed connections that
@@ -369,12 +371,14 @@ export default async function HistoryPage() {
               over three centuries of American history.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/tree"
-                className="px-8 py-3 bg-heritage-primary hover:bg-heritage-secondary text-white rounded-lg font-semibold transition-colors theme-shadow-md"
-              >
-                View Family Tree
-              </Link>
+              {navConfig.tree && (
+                <Link
+                  href="/tree"
+                  className="px-8 py-3 bg-heritage-primary hover:bg-heritage-secondary text-white rounded-lg font-semibold transition-colors theme-shadow-md"
+                >
+                  View Family Tree
+                </Link>
+              )}
               <Link
                 href="/"
                 className="px-8 py-3 theme-bg-secondary hover:theme-bg-tertiary theme-text-primary rounded-lg font-semibold transition-colors theme-shadow-md theme-border border-2"

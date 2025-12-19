@@ -128,7 +128,7 @@ export default async function AcknowledgementsPage() {
                 </li>
               </ul>
 
-              <div className="mt-6 p-4 bg-blue-900 bg-opacity-20 rounded theme-border border border-blue-700">
+              <div className="mt-6 p-4 theme-bg-tertiary rounded theme-border border">
                 <p className="text-sm leading-relaxed">
                   <strong className="theme-text-primary">
                     For the most complete and authoritative information
@@ -229,7 +229,7 @@ export default async function AcknowledgementsPage() {
                 genealogical record, please visit the original Culpepper Connections website.
               </p>
 
-              <div className="mt-6 p-4 bg-amber-900 bg-opacity-20 rounded theme-border border border-amber-700">
+              <div className="mt-6 p-4 theme-bg-tertiary rounded theme-border border">
                 <p className="text-sm leading-relaxed">
                   <strong className="theme-text-primary">Note:</strong> If you are a family member
                   with corrections, additions, or updated information, please contact Culpepper
@@ -261,7 +261,7 @@ export default async function AcknowledgementsPage() {
                 href="https://www.culpepperconnections.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-3 bg-heritage-primary hover:bg-heritage-secondary text-white rounded-lg font-semibold transition-colors theme-shadow-md"
+                className="px-8 py-3 theme-bg-accent hover:opacity-90 theme-text-on-accent rounded-lg font-semibold transition-opacity theme-shadow-md"
               >
                 Visit Culpepper Connections
               </a>
