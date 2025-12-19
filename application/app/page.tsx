@@ -1,7 +1,21 @@
+import Image from 'next/image';
+
 export default function Home() {
   return (
     <div className="min-h-screen theme-bg-primary">
       <main className="container mx-auto px-4 py-12">
+        {/* Culpepper Crest Image */}
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/culpepper_crest_no_bg.png"
+            alt="Culpepper Family Crest"
+            width={300}
+            height={300}
+            priority
+            className="drop-shadow-2xl"
+          />
+        </div>
+
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold theme-text-primary mb-4">Culpepper Family Genealogy</h2>
           <p className="text-xl theme-text-secondary max-w-2xl mx-auto">

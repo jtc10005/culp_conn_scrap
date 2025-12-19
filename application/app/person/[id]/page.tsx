@@ -47,19 +47,19 @@ export default async function PersonPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen theme-bg-primary p-8">
       <div className="max-w-4xl mx-auto">
         <Link
           href="/"
-          className="text-blue-600 hover:underline mb-4 inline-block"
+          className="text-blue-600 hover:underline mb-4 inline-block theme-text-primary hover:opacity-80"
         >
           ← Back to Family Tree
         </Link>
 
-        <div className="bg-white rounded-lg shadow-lg p-8 mt-4">
-          <h1 className="text-4xl font-bold mb-2">{person.name}</h1>
+        <div className="theme-bg-secondary rounded-lg theme-shadow-lg p-8 mt-4 theme-border border">
+          <h1 className="text-4xl font-bold mb-2 theme-text-primary">{person.name}</h1>
           {person.firstName && (
-            <p className="text-gray-600 mb-6">
+            <p className="theme-text-secondary mb-6">
               {person.firstName} {person.middleName && `${person.middleName} `}
               {person.lastName}
             </p>
@@ -67,18 +67,18 @@ export default async function PersonPage({
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
+              <h2 className="text-2xl font-semibold mb-4 theme-text-primary">Personal Information</h2>
               <dl className="space-y-2">
                 {person.gender && (
                   <div>
-                    <dt className="font-medium text-gray-700">Gender:</dt>
-                    <dd className="text-gray-900">{person.gender}</dd>
+                    <dt className="font-medium theme-text-secondary">Gender:</dt>
+                    <dd className="theme-text-primary">{person.gender}</dd>
                   </div>
                 )}
                 {person.birth && (
                   <div>
-                    <dt className="font-medium text-gray-700">Birth:</dt>
-                    <dd className="text-gray-900">
+                    <dt className="font-medium theme-text-secondary">Birth:</dt>
+                    <dd className="theme-text-primary">
                       {person.birth}
                       {person.birthPlace && ` at ${person.birthPlace}`}
                     </dd>
@@ -86,8 +86,8 @@ export default async function PersonPage({
                 )}
                 {person.death && (
                   <div>
-                    <dt className="font-medium text-gray-700">Death:</dt>
-                    <dd className="text-gray-900">
+                    <dt className="font-medium theme-text-secondary">Death:</dt>
+                    <dd className="theme-text-primary">
                       {person.death}
                       {person.deathPlace && ` at ${person.deathPlace}`}
                     </dd>
@@ -95,8 +95,8 @@ export default async function PersonPage({
                 )}
                 {person.burial && (
                   <div>
-                    <dt className="font-medium text-gray-700">Burial:</dt>
-                    <dd className="text-gray-900">
+                    <dt className="font-medium theme-text-secondary">Burial:</dt>
+                    <dd className="theme-text-primary">
                       {person.burial}
                       {person.burialPlace && ` at ${person.burialPlace}`}
                     </dd>
@@ -104,19 +104,19 @@ export default async function PersonPage({
                 )}
                 {person.marriageDate && (
                   <div>
-                    <dt className="font-medium text-gray-700">Marriage:</dt>
-                    <dd className="text-gray-900">{person.marriageDate}</dd>
+                    <dt className="font-medium theme-text-secondary">Marriage:</dt>
+                    <dd className="theme-text-primary">{person.marriageDate}</dd>
                   </div>
                 )}
               </dl>
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Relationships</h2>
+              <h2 className="text-2xl font-semibold mb-4 theme-text-primary">Relationships</h2>
               
               {(person.father || person.mother) && (
                 <div className="mb-4">
-                  <h3 className="font-medium text-gray-700 mb-2">Parents:</h3>
+                  <h3 className="font-medium theme-text-secondary mb-2">Parents:</h3>
                   <ul className="space-y-1">
                     {person.father && (
                       <li>
@@ -144,7 +144,7 @@ export default async function PersonPage({
 
               {person.spouses.length > 0 && (
                 <div className="mb-4">
-                  <h3 className="font-medium text-gray-700 mb-2">
+                  <h3 className="font-medium theme-text-secondary mb-2">
                     Spouse{person.spouses.length > 1 ? 's' : ''}:
                   </h3>
                   <ul className="space-y-1">
@@ -164,7 +164,7 @@ export default async function PersonPage({
 
               {person.children.length > 0 && (
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-2">
+                  <h3 className="font-medium theme-text-secondary mb-2">
                     Children ({person.children.length}):
                   </h3>
                   <ul className="space-y-1">

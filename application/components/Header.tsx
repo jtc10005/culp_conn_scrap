@@ -86,14 +86,14 @@ export default function Header() {
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-200">
-                  <p className="text-sm font-semibold text-gray-700">Settings</p>
+              <div className="absolute right-0 mt-2 w-56 theme-bg-secondary rounded-lg theme-shadow-lg theme-border border py-2 z-50">
+                <div className="px-4 py-2 theme-border-dark border-b">
+                  <p className="text-sm font-semibold theme-text-primary">Settings</p>
                 </div>
 
                 <button
                   onClick={toggleDarkMode}
-                  className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-3 flex items-center justify-between hover:theme-bg-tertiary transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     {isDarkMode ? (
@@ -103,7 +103,7 @@ export default function Header() {
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        className="w-5 h-5 text-gray-700"
+                        className="w-5 h-5 theme-text-primary"
                       >
                         <path
                           strokeLinecap="round"
@@ -118,7 +118,7 @@ export default function Header() {
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        className="w-5 h-5 text-gray-700"
+                        className="w-5 h-5 theme-text-primary"
                       >
                         <path
                           strokeLinecap="round"
@@ -127,7 +127,7 @@ export default function Header() {
                         />
                       </svg>
                     )}
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm theme-text-primary">
                       {isDarkMode ? 'Dark Mode' : 'Light Mode'}
                     </span>
                   </div>

@@ -105,7 +105,7 @@ export default function PracticePage() {
   }, []);
 
   return (
-    <div className="w-full h-screen relative">
+    <div className="w-full h-screen relative theme-bg-primary">
       <div className="w-full h-full">
         <svg ref={svgRef} className="w-full h-full"></svg>
       </div>
