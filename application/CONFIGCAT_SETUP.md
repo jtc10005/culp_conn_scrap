@@ -24,10 +24,45 @@ In your ConfigCat dashboard:
    - **Default Value** (single line, no whitespace):
 
    ```json
-   { "tree": true, "history": true, "people": true, "acknowledgements": true, "practice": true }
+   {
+     "tree": true,
+     "history": true,
+     "people": true,
+     "acknowledgements": true,
+     "practice": true,
+     "about": false
+   }
    ```
 
    **Important**: ConfigCat uses text settings for JSON data. Make sure to enter the JSON on a single line without extra whitespace.
+
+### 2. Create Calligraphic Font Flag
+
+1. Go to **Feature Flags & Settings**
+2. Click **Add Setting**
+3. Create a setting with these details:
+   - **Key**: `calligraphic_font`
+   - **Name**: Calligraphic Font
+   - **Type**: **Boolean**
+   - **Default Value**: `false`
+
+   This flag controls whether to use Tangerine calligraphic font site-wide (experimental).
+
+### Flag Options:
+
+**Navigation Config (`navigation_config` - Text/JSON):**
+
+- `tree` - Show/hide Family Tree navigation and route
+- `history` - Show/hide Family History navigation and route
+- `people` - Show/hide Browse People navigation and route
+- `acknowledgements` - Show/hide Credits navigation and route
+- `practice` - Show/hide SVG Practice navigation and route
+- `about` - Show/hide About page navigation and route
+
+**Calligraphic Font (`calligraphic_font` - Boolean):**
+
+- `true` - Apply Tangerine calligraphic font to all text site-wide
+- `false` - Use standard Geist fonts (default)
 
 ### 2. Get Your SDK Key
 

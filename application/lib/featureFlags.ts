@@ -18,6 +18,7 @@ export interface NavigationConfig {
   people: boolean;
   acknowledgements: boolean;
   practice: boolean;
+  about: boolean;
 }
 
 // Default navigation config (fallback if ConfigCat fails)
@@ -27,6 +28,7 @@ const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
   people: true,
   acknowledgements: true,
   practice: true,
+  about: false,
 };
 
 /**
@@ -63,6 +65,14 @@ export async function getFeatureFlag(
     console.error(`Error fetching feature flag '${flagKey}' from ConfigCat:`, error);
     return defaultValue;
   }
+}
+
+/**
+ * Get calligraphic font feature flag
+ * Independent boolean flag to enable/disable Tangerine font site-wide
+ */
+export async function getCalligraphicFontEnabled(): Promise<boolean> {
+  return getFeatureFlag('calligraphic_font', false);
 }
 
 /**

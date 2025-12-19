@@ -76,6 +76,18 @@ export default async function Home() {
             </a>
           )}
 
+          {navConfig.about && (
+            <a
+              href="/about"
+              className="p-8 theme-bg-secondary rounded-lg theme-shadow-lg hover:theme-shadow-xl transition-shadow theme-border border"
+            >
+              <h2 className="text-2xl font-semibold theme-text-primary mb-3">ℹ️ About</h2>
+              <p className="theme-text-secondary">
+                Learn about the technology and process behind this project
+              </p>
+            </a>
+          )}
+
           {navConfig.practice && (
             <a
               href="/practice"

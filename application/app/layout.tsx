@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Tangerine } from 'next/font/google';
 import './globals.css';
 import { HeaderWithFlags as Header } from '@/components';
+import { getCalligraphicFontEnabled } from '@lib';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -13,16 +14,27 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const tangerine = Tangerine({
+  variable: '--font-tangerine',
+  subsets: ['latin'],
+  weight: ['400', '700'],
+});
+
 export const metadata: Metadata = {
   title: 'Culpepper.Info',
   description: 'Explore the Culpepper family tree',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const useCalligraphicFont = await getCalligraphicFontEnabled();
+  const fontClasses = useCalligraphicFont
+    ? `${tangerine.variable} font-[family-name:var(--font-tangerine)] antialiased`
+    : `${geistSans.variable} ${geistMono.variable} antialiased`;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -41,7 +53,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={fontClasses}>
         <Header />
         {children}
       </body>
