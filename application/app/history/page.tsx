@@ -381,6 +381,159 @@ export default async function HistoryPage() {
             </div>
           </section>
 
+          {/* References Section */}
+          <section className="theme-bg-secondary p-8 rounded-lg theme-shadow-lg theme-border border-2">
+            <h2 className="text-3xl font-bold mb-6 text-heritage-primary">References & Sources</h2>
+            <div className="space-y-4 theme-text-secondary">
+              <p className="leading-relaxed mb-4">
+                All historical information, genealogical data, and family research presented on this
+                page has been compiled from the following sources:
+              </p>
+
+              <div className="space-y-3">
+                <div className="theme-bg-tertiary p-4 rounded theme-border border">
+                  <h3 className="font-semibold theme-text-primary mb-2">Primary Source:</h3>
+                  <p className="text-sm">
+                    <a
+                      href="https://www.culpepperconnections.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-heritage-primary hover:text-heritage-secondary underline font-semibold"
+                    >
+                      Culpepper Connections
+                    </a>{' '}
+                    - The premier genealogical resource for the Culpepper family, maintained by
+                    Lewis Wyman Griffin, Jr.
+                  </p>
+                  <ul className="mt-3 space-y-1 text-xs theme-text-tertiary ml-4">
+                    <li>
+                      •{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/historical/default.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        Historical Culpeppers
+                      </a>{' '}
+                      - Comprehensive historical documents and treatises
+                    </li>
+                    <li>
+                      •{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/dna.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        Culpepper Y-DNA Project
+                      </a>{' '}
+                      - DNA testing results and genetic genealogy research
+                    </li>
+                    <li>
+                      •{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/archives/va/norfolk1661-1724.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        Norfolk, VA Records (1667-1724)
+                      </a>{' '}
+                      - Colonial Virginia court records and land deeds
+                    </li>
+                    <li>
+                      •{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/historical/namevariations.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        Name Variations: Colepeper vs. Culpeper vs. Culpepper
+                      </a>
+                    </li>
+                    <li>
+                      •{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/historical/theories/linkage.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        The English/New World Linkage
+                      </a>{' '}
+                      - Theories on Henry Culpeper&apos;s English origins
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="theme-bg-tertiary p-4 rounded theme-border border">
+                  <h3 className="font-semibold theme-text-primary mb-2">
+                    Scholarly Works Referenced:
+                  </h3>
+                  <ul className="space-y-2 text-sm">
+                    <li>
+                      • Attree, Col. F. W. T. &amp; Booker, Rev. J. H. L. (1904).{' '}
+                      <em>The Sussex Colepepers</em>. Sussex Archaeological Collections, Vol. XLVII.{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/historical/sussex/default.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        Available online
+                      </a>
+                    </li>
+                    <li>
+                      • Harrison, Fairfax (1926). <em>Proprietors of the Northern Neck</em>.{' '}
+                      <a
+                        href="https://www.culpepperconnections.com/historical/nneck/default.htm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-heritage-primary hover:text-heritage-secondary underline"
+                      >
+                        Available online
+                      </a>
+                    </li>
+                    <li>
+                      • FamilyTreeDNA Culpepper Y-DNA Project - Genetic testing results showing 80%
+                      of American Culpeppers descend from Henry of Lower Norfolk County
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="theme-bg-tertiary p-4 rounded theme-border border">
+                  <h3 className="font-semibold theme-text-primary mb-2">Historical Records:</h3>
+                  <ul className="space-y-1 text-sm">
+                    <li>• Lower Norfolk County, Virginia Court Records (1658-1675)</li>
+                    <li>• Lancaster County, Virginia Land Deeds (1658)</li>
+                    <li>• Colonial Virginia Land Patents and Grants</li>
+                    <li>• Third Virginia Charter (1612) - Mentions Sir Edward Culpeper</li>
+                  </ul>
+                </div>
+
+                <div className="mt-6 p-4 bg-opacity-50 theme-bg-tertiary rounded theme-border border">
+                  <p className="text-xs italic theme-text-tertiary">
+                    <strong>Note:</strong> This website serves as a modern, interactive
+                    visualization of the extensive genealogical research compiled on Culpepper
+                    Connections. For the most complete and authoritative information, including
+                    source documents, additional research, and ongoing updates, please visit{' '}
+                    <a
+                      href="https://www.culpepperconnections.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-heritage-primary hover:text-heritage-secondary underline"
+                    >
+                      www.culpepperconnections.com
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Call to Action */}
           <section className="text-center space-y-6">
             <h2 className="text-3xl font-bold theme-text-primary">Explore Your Heritage</h2>
