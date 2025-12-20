@@ -31,7 +31,9 @@ export default async function AmericanPage() {
           <p className="mb-4">
             Henry Culpeper (circa 1633 - after 1675) is the proven progenitor of most American
             Culpeppers. Through Y-DNA testing, 117 Culpepper males have been tested, and 80% share
-            close DNA relationships that all trace back to Henry.<sup>[1]</sup>
+            close DNA relationships that all trace back to Henry.<sup>[1]</sup> He arrived in
+            Virginia as a young man around age 20, probably paying for his own voyage, which
+            suggests he came from a family of some means.
           </p>
         </div>
 
@@ -40,26 +42,31 @@ export default async function AmericanPage() {
             <h3 className="text-xl font-semibold mb-4">Life Timeline</h3>
             <ul className="space-y-3">
               <li>
-                <strong>Born:</strong> circa 1633, England
+                <strong>Born:</strong> circa 1633, probably England
               </li>
               <li>
-                <strong>Arrived in Virginia:</strong> May 1653 or earlier
+                <strong>Arrived in Virginia:</strong> May 1653 or earlier (sold his 50-acre
+                headright to Captain Nathaniel Hurd)
               </li>
               <li>
-                <strong>First Record:</strong> 1658, listed as &ldquo;Planter&rdquo; in Lancaster
-                County, VA
+                <strong>Dec 7, 1658:</strong> First documented record as &ldquo;Henry Colepepper,
+                Planter&rdquo; selling a cow in Lancaster County, VA
               </li>
               <li>
-                <strong>Settled:</strong> Lower Norfolk County, VA by 1667
+                <strong>May 10-June 30, 1664:</strong> Listed as shipper with John Culpepper aboard
+                the &ldquo;Defence&rdquo; from London to New England
               </li>
               <li>
-                <strong>Marriage:</strong> circa 1660 to Elizabeth Green
+                <strong>By 1667:</strong> Moved to Lower Norfolk County, VA
               </li>
               <li>
-                <strong>Last Record:</strong> August 1675
+                <strong>Marriage:</strong> Date unknown, to Elizabeth (maiden name probably Greene)
               </li>
               <li>
-                <strong>Death:</strong> after 1675, Lower Norfolk County, VA
+                <strong>Last Record:</strong> 1675, Lower Norfolk County, VA
+              </li>
+              <li>
+                <strong>Death:</strong> circa 1675-1680, Lower Norfolk County, VA
               </li>
             </ul>
           </div>
@@ -76,19 +83,28 @@ export default async function AmericanPage() {
               </li>
               <li className="flex items-start">
                 <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
-                <span>Property owner and cattle farmer, suggesting a person of means</span>
+                <span>
+                  Listed as &ldquo;Planter&rdquo; indicating land ownership and established
+                  residency in Virginia
+                </span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
                 <span>
-                  Literate and educated, signed deeds with a distinctive script &ldquo;H&rdquo;
-                  <sup>[2]</sup>
+                  Literate and educated - signed all deeds with a distinctive handwritten script
+                  &ldquo;H&rdquo;, suggesting education abroad<sup>[2]</sup>
                 </span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
                 <span>
                   Known children: Robert Culpepper (b. 1664) and Henry Culpepper Jr. (b. 1669)
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
+                <span>
+                  Traveled with a John Culpepper in 1664, suggesting family connections to England
                 </span>
               </li>
             </ul>
@@ -105,16 +121,23 @@ export default async function AmericanPage() {
               Phase 1: Arrival and Early Establishment (1653-1658)
             </h4>
             <p className="mb-3">
-              Henry likely arrived in Virginia in May 1653 or earlier, paying for his own passage
-              rather than arriving as an indentured servant. This is significant because it suggests
-              he had financial means—indenture was the common method for working-class English
-              immigrants to afford passage to America.<sup>[2]</sup>
+              Henry likely arrived in Virginia in <strong>May 1653 or earlier</strong>, paying for
+              his own passage rather than arriving as an indentured servant. This is significant
+              because it suggests he had financial means—indenture was the common method for
+              working-class English immigrants to afford passage to America.<sup>[2]</sup>
             </p>
             <p className="mb-3">
               Shortly after arrival, he sold his <em>headright</em> (a claim to 50 acres of land
-              given to those who paid their own passage) to Captain Nathaniel Hurd. This suggests
-              Henry either had access to better land through other means, or he preferred immediate
-              capital to start his enterprises.<sup>[2]</sup>
+              given to those who paid their own passage) to <strong>Captain Nathaniel Hurd</strong>.
+              This suggests Henry either had access to better land through other means, or he
+              preferred immediate capital to start his enterprises. The fact that he was not
+              indentured to Captain Hurd indicates this was a straightforward business transaction
+              between free men.<sup>[2]</sup>
+            </p>
+            <p className="mb-3">
+              During this period, Henry would have been adapting to colonial life, establishing
+              connections, and learning the tobacco and livestock trade that would make him
+              successful.
             </p>
           </div>
 
@@ -123,16 +146,26 @@ export default async function AmericanPage() {
               Phase 2: Lancaster County Period (1658-1667)
             </h4>
             <p className="mb-3">
-              By December 1658, court records show &ldquo;Henry Colepepper, Planter&rdquo; selling
-              cattle in Lancaster County. The designation &ldquo;Planter&rdquo; indicated property
-              ownership and agricultural pursuits—within five years of arrival, Henry had
-              established himself as a landowner and livestock farmer.<sup>[2]</sup>
+              By <strong>December 7, 1658</strong>, court records show{' '}
+              <strong>&ldquo;Henry Colepepper, Planter&rdquo;</strong> selling a cow in Lancaster
+              County. The designation &ldquo;Planter&rdquo; was significant—it indicated property
+              ownership and established residency, not merely someone working another&apos;s land.
+              Within five years of arrival, Henry had established himself as a landowner and
+              livestock farmer.<sup>[2]</sup>
             </p>
             <p className="mb-3">
               The cattle sale demonstrates that Henry was engaged in commercial agriculture, not
               merely subsistence farming. Colonial Virginia&apos;s economy was largely based on
               tobacco, but successful planters diversified with livestock, which provided both food
               security and additional income.
+            </p>
+            <p className="mb-3">
+              Interestingly, in September 1659, a <strong>John Colepeper</strong> also appears in
+              Lancaster County records witnessing a deed establishing parish boundaries. On{' '}
+              <strong>May 10-June 30, 1664</strong>, both Henry and John Culpepper are listed as
+              &ldquo;Shippers by the Defence&rdquo; traveling from London to New England. This
+              suggests Henry maintained connections with England and may have traveled back across
+              the Atlantic, possibly with a relative.<sup>[2]</sup>
             </p>
           </div>
 
@@ -141,9 +174,9 @@ export default async function AmericanPage() {
               Phase 3: Lower Norfolk County Settlement (1667-1675)
             </h4>
             <p className="mb-3">
-              By 1667, Henry had relocated to Lower Norfolk County (in present-day southeastern
-              Virginia, including areas now part of Norfolk and Virginia Beach). This would remain
-              his home for the rest of his documented life.<sup>[2]</sup>
+              By 1667, Henry had relocated to <strong>Lower Norfolk County</strong> (in present-day
+              southeastern Virginia, including areas now part of Norfolk and Virginia Beach). This
+              would remain his home for the rest of his documented life.<sup>[2]</sup>
             </p>
             <p className="mb-3">
               Court records from this period reveal an active member of the colonial community:
@@ -157,13 +190,22 @@ export default async function AmericanPage() {
                 • Served as appraiser for estates (a position of trust given to respected community
                 members)
               </li>
-              <li>• Witnessed legal documents (indicating literacy and standing)</li>
+              <li>
+                • Witnessed legal documents (indicating literacy and social standing)—Henry signed
+                all deeds with a distinctive handwritten &ldquo;H&rdquo;, suggesting education
+                abroad
+              </li>
               <li>• Bought, sold, and managed significant properties and livestock</li>
+              <li>
+                • His wife Elizabeth consented to certain land transactions, suggesting she may have
+                brought property to the marriage
+              </li>
             </ul>
             <p className="mt-3">
-              His last documented appearance in colonial records is August 1675, after which the
-              historical trail goes cold. He presumably died shortly thereafter in Lower Norfolk
-              County.<sup>[2]</sup>
+              His last documented appearance in colonial records is <strong>1675</strong>, after
+              which the historical trail goes cold. He presumably died shortly thereafter (circa
+              1675-1680) in Lower Norfolk County. In 1691, when Lower Norfolk was split, his
+              descendants&apos; lands fell into the newly created Norfolk County.<sup>[2]</sup>
             </p>
           </div>
         </div>
@@ -176,10 +218,10 @@ export default async function AmericanPage() {
         <div className="bg-purple-50 dark:bg-purple-950 p-6 rounded-lg mb-6">
           <h3 className="text-xl font-semibold mb-3">Elizabeth, Wife of Henry</h3>
           <p className="mb-4">
-            Henry married a woman named Elizabeth, whose maiden name was likely{' '}
-            <strong>Green</strong>, around 1660. Several land transactions required Elizabeth&apos;s
-            consent (as indicated by notations in deeds), suggesting she may have brought property
-            to the marriage from a previous union or inheritance.<sup>[2]</sup>
+            Henry married a woman named <strong>Elizabeth</strong>, whose maiden name was likely{' '}
+            <strong>Greene</strong>, around 1660 (date unknown). Several land transactions required
+            Elizabeth&apos;s consent (as indicated by notations in deeds), suggesting she may have
+            brought property to the marriage from a previous union or inheritance.<sup>[2]</sup>
           </p>
           <p>
             Under English common law (which governed Virginia), a married woman&apos;s property
@@ -701,11 +743,66 @@ export default async function AmericanPage() {
           </div>
         </div>
 
-        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-950 rounded-lg">
+        <div className="mt-8 p-6 bg-green-50 dark:bg-green-950 rounded-lg">
+          <h3 className="text-lg font-semibold mb-3">Additional Free Genealogy Resources</h3>
+          <p className="mb-3 text-sm">
+            To research your own Culpepper ancestry and connect with other researchers, explore
+            these free, open-source genealogy platforms:
+          </p>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <strong>
+                <a
+                  href="https://www.wikitree.com/genealogy/CULPEPPER"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  WikiTree Culpepper Family Project
+                </a>
+              </strong>{' '}
+              — 1,370+ documented Culpepper profiles with source citations, DNA connections, and
+              active genealogist collaboration. Includes detailed profile for Henry Culpepper with
+              timeline and historical analysis.
+            </li>
+            <li>
+              <strong>
+                <a
+                  href="https://www.familysearch.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  FamilySearch
+                </a>
+              </strong>{' '}
+              — Billions of historical records including Virginia colonial documents, census
+              records, church records, and court documents. Free access to digitized original
+              sources.
+            </li>
+            <li>
+              <strong>
+                <a
+                  href="https://www.geni.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Geni World Family Tree
+                </a>
+              </strong>{' '}
+              — Collaborative genealogy platform connecting 205+ million profiles. Free basic
+              account allows you to build your tree and connect with living relatives.
+            </li>
+          </ul>
+        </div>
+
+        <div className="mt-6 p-6 bg-blue-50 dark:bg-blue-950 rounded-lg">
           <p className="text-xs italic">
             <strong>Note:</strong> This page serves as a comprehensive overview of American
-            Culpepper history based on research compiled at Culpepper Connections. For complete
-            source documents, additional research materials, and ongoing updates, visit{' '}
+            Culpepper history based on research compiled at Culpepper Connections and verified
+            through WikiTree genealogical documentation. For complete source documents, additional
+            research materials, and ongoing updates, visit{' '}
             <a
               href="https://www.culpepperconnections.com"
               target="_blank"

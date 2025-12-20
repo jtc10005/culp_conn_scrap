@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getNavigationConfig, getCalligraphicFontEnabled } from '@/lib';
 import { DarkModeToggle } from '@/components';
+import MobileMenu from './MobileMenu';
 
 export default async function Header() {
   // Get navigation config and font setting from ConfigCat
@@ -20,10 +21,15 @@ export default async function Header() {
     <header className="w-full theme-banner-bg theme-banner-border border-b shadow-lg">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
-          <h1 className={`text-6xl theme-banner-text ${titleFontClasses}`}>Culpepper.info</h1>
+          <h1
+            className={`text-4xl md:text-6xl theme-banner-text ${titleFontClasses}`}
+          >
+            Culpepper.info
+          </h1>
         </Link>
-        <div className="flex items-center gap-6">
-          <nav className="flex gap-6">
+        <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex gap-6">
             {navConfig.tree && (
               <Link
                 href="/tree"
@@ -67,15 +73,22 @@ export default async function Header() {
             {navConfig.practice && (
               <Link
                 href="/practice"
-                className={`theme-banner-text theme-banner-text-hover transition-colors ${navLinkFontClasses} hidden lg:block`}
+                className={`theme-banner-text theme-banner-text-hover transition-colors ${navLinkFontClasses}`}
               >
                 Practice
               </Link>
             )}
           </nav>
 
-          {/* Dark Mode Toggle */}
-          <DarkModeToggle />
+          {/* Desktop Dark Mode Toggle */}
+          <div className="hidden lg:block">
+            <DarkModeToggle />
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="lg:hidden">
+            <MobileMenu navConfig={navConfig} navLinkFontClasses={navLinkFontClasses} />
+          </div>
         </div>
       </div>
     </header>
