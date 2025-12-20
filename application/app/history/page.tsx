@@ -51,6 +51,24 @@ export default async function HistoryPage() {
             </div>
           </section>
 
+          {/* Prominent Crest Link */}
+          <section className="text-center">
+            <Link
+              href="/history/crest"
+              className="inline-flex items-center gap-3 px-8 py-4 text-lg theme-bg-accent hover:opacity-90 theme-text-on-accent rounded-lg font-semibold transition-opacity theme-shadow-lg"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              Explore the Family Crest & Motto
+            </Link>
+          </section>
+
           {/* Progenitor Section */}
           <section>
             <h2 className="text-3xl font-bold mb-6 text-heritage-primary">
@@ -379,6 +397,12 @@ export default async function HistoryPage() {
                   View Family Tree
                 </Link>
               )}
+              <Link
+                href="/history/crest"
+                className="px-8 py-3 theme-bg-accent hover:opacity-90 theme-text-on-accent rounded-lg font-semibold transition-opacity theme-shadow-md"
+              >
+                Family Crest & Motto
+              </Link>
               <Link
                 href="/"
                 className="px-8 py-3 theme-bg-secondary hover:theme-bg-tertiary theme-text-primary rounded-lg font-semibold transition-colors theme-shadow-md theme-border border-2"
