@@ -21,9 +21,7 @@ export default async function Header() {
     <header className="w-full theme-banner-bg theme-banner-border border-b shadow-lg">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
-          <h1
-            className={`text-4xl md:text-6xl theme-banner-text ${titleFontClasses}`}
-          >
+          <h1 className={`text-4xl md:text-6xl theme-banner-text ${titleFontClasses}`}>
             Culpepper.info
           </h1>
         </Link>
