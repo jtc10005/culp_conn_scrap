@@ -73,7 +73,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
           // Build SET clause dynamically based on changes
           const setClauses: string[] = [];
-          const parameters: Record<string, string | number | boolean | null> = {
+          const parameters: Record<string, string | number | boolean | string[] | null> = {
             personId: edit.person_id,
           };
 
