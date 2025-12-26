@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { SuggestEditButton } from '@/components';
+import { getEditPersonRecordEnabled } from '@/lib';
 
 type RelatedPerson = {
   id: string;
@@ -55,6 +57,7 @@ async function getPerson(id: string): Promise<Person | null> {
 export default async function PersonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const person = await getPerson(id);
+  const editEnabled = await getEditPersonRecordEnabled();
 
   if (!person) {
     notFound();
@@ -71,11 +74,14 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
         </Link>
 
         <div className="theme-bg-secondary rounded-lg theme-shadow-lg p-8 mt-4 theme-border border">
-          <h1 className="text-4xl font-bold mb-2 theme-text-primary">
-            {person.firstName && person.lastName
-              ? `${person.firstName}${person.middleName ? ` ${person.middleName}` : ''} ${person.lastName}`
-              : person.name}
-          </h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-4xl font-bold theme-text-primary">
+              {person.firstName && person.lastName
+                ? `${person.firstName}${person.middleName ? ` ${person.middleName}` : ''} ${person.lastName}`
+                : person.name}
+            </h1>
+            {editEnabled && <SuggestEditButton person={person} />}
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>

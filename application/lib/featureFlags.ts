@@ -76,6 +76,14 @@ export async function getCalligraphicFontEnabled(): Promise<boolean> {
 }
 
 /**
+ * Get edit person record feature flag
+ * Controls whether users can suggest edits to person records
+ */
+export async function getEditPersonRecordEnabled(): Promise<boolean> {
+  return getFeatureFlag('editPersonRecordFlag', false);
+}
+
+/**
  * Close ConfigCat client (call on app shutdown)
  */
 export function closeConfigCat() {

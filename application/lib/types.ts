@@ -42,3 +42,33 @@ export type TreeNode = {
   person: Person;
   children?: TreeNode[];
 };
+
+// Edit submission types
+export type EditStatus = 'pending' | 'approved' | 'rejected';
+
+export type PersonChanges = Partial<Omit<Person, 'id' | 'spouses' | 'children'>>;
+
+export type PendingEdit = {
+  id: string;
+  person_id: string;
+  submitted_by: string;
+  submitted_at: string;
+  status: EditStatus;
+  reviewed_by?: string;
+  reviewed_at?: string;
+  changes: PersonChanges;
+  submitter_notes?: string;
+  reviewer_notes?: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EditHistory = {
+  id: string;
+  person_id: string;
+  applied_at: string;
+  applied_by: string;
+  changes: PersonChanges;
+  edit_id?: string;
+  created_at: string;
+};

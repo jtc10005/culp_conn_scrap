@@ -37,13 +37,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       const spouses = record.get('spouses').filter((s: RelatedPerson) => s.id);
       const children = record.get('children').filter((c: RelatedPerson) => c.id);
 
-      // Debug logging
-      console.log('Person ID:', node.properties.id);
-      console.log('Person father property:', node.properties.father);
-      console.log('Person mother property:', node.properties.mother);
-      console.log('Father node:', fatherNode);
-      console.log('Mother node:', motherNode);
-
       const person: PersonWithRelations = {
         id: node.properties.id,
         name: node.properties.name,

@@ -10,6 +10,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.89.0",
     "@types/d3": "^7.4.3",
     "configcat-js-ssr": "^8.5.2",
     "d3": "^7.9.0",
