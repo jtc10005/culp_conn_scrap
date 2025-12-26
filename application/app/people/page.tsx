@@ -359,19 +359,10 @@ export default function PeoplePage() {
                             className="font-medium theme-text-primary hover:text-heritage-primary transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {person.name}
+                            {person.firstName && person.lastName
+                              ? `${person.firstName}${person.middleName ? ` ${person.middleName}` : ''} ${person.lastName}`
+                              : person.name}
                           </Link>
-                          {(person.firstName || person.lastName) && (
-                            <div className="text-sm theme-text-tertiary mt-1">
-                              {person.firstName && person.firstName !== person.name && (
-                                <span>
-                                  {person.firstName}
-                                  {person.middleName && ` ${person.middleName}`}
-                                  {person.lastName && ` ${person.lastName}`}
-                                </span>
-                              )}
-                            </div>
-                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 theme-text-secondary hidden md:table-cell">

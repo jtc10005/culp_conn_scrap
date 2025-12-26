@@ -1,6 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
+type RelatedPerson = {
+  id: string;
+  name: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+};
+
 type Person = {
   id: string;
   name: string;
@@ -15,11 +23,18 @@ type Person = {
   burial?: string;
   burialPlace?: string;
   marriageDate?: string;
-  father?: string;
-  mother?: string;
-  spouses: string[];
-  children: string[];
+  father?: RelatedPerson;
+  mother?: RelatedPerson;
+  spouses: RelatedPerson[];
+  children: RelatedPerson[];
 };
+
+function formatPersonName(person: RelatedPerson): string {
+  if (person.firstName && person.lastName) {
+    return `${person.firstName}${person.middleName ? ` ${person.middleName}` : ''} ${person.lastName}`;
+  }
+  return person.name;
+}
 
 async function getPerson(id: string): Promise<Person | null> {
   try {
@@ -56,13 +71,11 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
         </Link>
 
         <div className="theme-bg-secondary rounded-lg theme-shadow-lg p-8 mt-4 theme-border border">
-          <h1 className="text-4xl font-bold mb-2 theme-text-primary">{person.name}</h1>
-          {person.firstName && (
-            <p className="theme-text-secondary mb-6">
-              {person.firstName} {person.middleName && `${person.middleName} `}
-              {person.lastName}
-            </p>
-          )}
+          <h1 className="text-4xl font-bold mb-2 theme-text-primary">
+            {person.firstName && person.lastName
+              ? `${person.firstName}${person.middleName ? ` ${person.middleName}` : ''} ${person.lastName}`
+              : person.name}
+          </h1>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -122,20 +135,20 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
                     {person.father && (
                       <li>
                         <Link
-                          href={`/person/${person.father}`}
+                          href={`/person/${person.father.id}`}
                           className="text-blue-600 hover:underline"
                         >
-                          Father (ID: {person.father})
+                          Father: {formatPersonName(person.father)}
                         </Link>
                       </li>
                     )}
                     {person.mother && (
                       <li>
                         <Link
-                          href={`/person/${person.mother}`}
+                          href={`/person/${person.mother.id}`}
                           className="text-blue-600 hover:underline"
                         >
-                          Mother (ID: {person.mother})
+                          Mother: {formatPersonName(person.mother)}
                         </Link>
                       </li>
                     )}
@@ -149,13 +162,13 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
                     Spouse{person.spouses.length > 1 ? 's' : ''}:
                   </h3>
                   <ul className="space-y-1">
-                    {person.spouses.map((spouseId) => (
-                      <li key={spouseId}>
+                    {person.spouses.map((spouse) => (
+                      <li key={spouse.id}>
                         <Link
-                          href={`/person/${spouseId}`}
+                          href={`/person/${spouse.id}`}
                           className="text-blue-600 hover:underline"
                         >
-                          Spouse (ID: {spouseId})
+                          {formatPersonName(spouse)}
                         </Link>
                       </li>
                     ))}
@@ -169,10 +182,13 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
                     Children ({person.children.length}):
                   </h3>
                   <ul className="space-y-1">
-                    {person.children.map((childId) => (
-                      <li key={childId}>
-                        <Link href={`/person/${childId}`} className="text-blue-600 hover:underline">
-                          Child (ID: {childId})
+                    {person.children.map((child) => (
+                      <li key={child.id}>
+                        <Link
+                          href={`/person/${child.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {formatPersonName(child)}
                         </Link>
                       </li>
                     ))}
