@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -17,7 +17,7 @@ interface Person {
   deathPlace?: string;
 }
 
-export default function PeoplePage() {
+function PeoplePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -484,5 +484,20 @@ export default function PeoplePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PeoplePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen theme-bg-primary theme-text-primary flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-heritage-primary mx-auto mb-4"></div>
+          <p className="text-xl">Loading search...</p>
+        </div>
+      </div>
+    }>
+      <PeoplePageContent />
+    </Suspense>
   );
 }
