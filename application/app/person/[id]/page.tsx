@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { SuggestEditButton } from '@/components';
+import { BackButton, SuggestEditButton } from '@/components';
 import { getEditPersonRecordEnabled, getCulpepperConnectionLinkEnabled } from '@/lib';
 
 type RelatedPerson = {
@@ -72,12 +72,7 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
   return (
     <div className="min-h-screen theme-bg-primary p-8">
       <div className="max-w-4xl mx-auto">
-        <Link
-          href="/"
-          className="text-blue-600 hover:underline mb-4 inline-block theme-text-primary hover:opacity-80"
-        >
-          ← Back to Family Tree
-        </Link>
+        <BackButton fallbackHref="/people" fallbackText="Back to Search" />
 
         <div className="theme-bg-secondary rounded-lg theme-shadow-lg p-8 mt-4 theme-border border">
           <div className="flex justify-between items-start mb-4">

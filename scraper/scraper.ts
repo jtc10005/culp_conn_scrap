@@ -122,6 +122,12 @@ async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
 
 /**
  * Crawl all people starting from a root person, saving in batches
+ *
+ * By default, this crawls the entire genealogy tree starting from Henry Culpeper (ID: 1).
+ *
+ * To scrape just one person for testing:
+ * 1. Change the queue initialization to: [{ page: "p1391.htm", anchor: "i41718" }]
+ * 2. Comment out the "Add discovered people to queue" section (around line 240)
  */
 async function crawl() {
   console.log("Starting crawl with batch saving...");
@@ -131,8 +137,14 @@ async function crawl() {
 
   const session = driver.session({ database: config.NEO4J_DATABASE });
   const visited = new Set<string>();
-  // TEST: Start with person 41718 only
-  const queue: QueueItem[] = [{ page: "p1391.htm", anchor: "i41718" }];
+
+  // Start with root person (Henry Culpeper, ID: 1)
+  const queue: QueueItem[] = [{ page: "p1.htm", anchor: "i1" }];
+
+  // Example: To scrape just one person, use:
+  // const queue: QueueItem[] = [{ page: "p1391.htm", anchor: "i41718" }];
+  // And comment out the "Add discovered people to queue" section below
+
   const pageCache = new Map<string, string>();
 
   const batch: Person[] = [];
@@ -182,8 +194,7 @@ async function crawl() {
         continue;
       }
 
-      const { person, unlinkedChildren } = parsed;
-      // TEST: Not using discovered to avoid crawling related people
+      const { person, unlinkedChildren, discovered } = parsed;
 
       // Add to batch
       batch.push(person);
@@ -232,8 +243,15 @@ async function crawl() {
         batch.length = 0; // Clear batch
       }
 
-      // Add discovered people to queue
-      // TEST: Skip adding discovered people to only process person 41718
+      // Add discovered people to queue (traverse relationships)
+      for (const disc of discovered) {
+        const discKey = `${disc.page}#${disc.anchor}`;
+        if (!visited.has(discKey)) {
+          queue.push(disc);
+        }
+      }
+
+      // Example: To scrape just one person, comment out the above loop:
       // for (const disc of discovered) {
       //   const discKey = `${disc.page}#${disc.anchor}`;
       //   if (!visited.has(discKey)) {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Person {
   id: string;
@@ -17,11 +18,14 @@ interface Person {
 }
 
 export default function PeoplePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [people, setPeople] = useState<Person[]>([]);
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
-  const [firstName, setFirstName] = useState('');
-  const [middleName, setMiddleName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState(searchParams.get('firstName') || '');
+  const [middleName, setMiddleName] = useState(searchParams.get('middleName') || '');
+  const [lastName, setLastName] = useState(searchParams.get('lastName') || '');
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -52,37 +56,67 @@ export default function PeoplePage() {
     fetchPeople();
   }, []);
 
+  // Extracted search logic
+  const performSearch = useCallback(
+    (firstNameTerm: string, middleNameTerm: string, lastNameTerm: string) => {
+      const firstLower = firstNameTerm.trim().toLowerCase();
+      const middleLower = middleNameTerm.trim().toLowerCase();
+      const lastLower = lastNameTerm.trim().toLowerCase();
+
+      // Check if at least one field has input
+      if (!firstLower && !middleLower && !lastLower) {
+        setFilteredPeople([]);
+        setHasSearched(false);
+        return;
+      }
+
+      setIsSearching(true);
+      setHasSearched(true);
+
+      const filtered = people.filter((person) => {
+        const personFirstName = person.firstName?.toLowerCase() || '';
+        const personMiddleName = person.middleName?.toLowerCase() || '';
+        const personLastName = person.lastName?.toLowerCase() || '';
+
+        // All specified fields must match (AND logic)
+        const firstNameMatch = !firstLower || personFirstName.includes(firstLower);
+        const middleNameMatch = !middleLower || personMiddleName.includes(middleLower);
+        const lastNameMatch = !lastLower || personLastName.includes(lastLower);
+
+        return firstNameMatch && middleNameMatch && lastNameMatch;
+      });
+
+      setFilteredPeople(filtered);
+      setIsSearching(false);
+    },
+    [people]
+  );
+
+  // Perform search on mount if URL params exist
+  useEffect(() => {
+    if (people.length > 0) {
+      const firstNameParam = searchParams.get('firstName') || '';
+      const middleNameParam = searchParams.get('middleName') || '';
+      const lastNameParam = searchParams.get('lastName') || '';
+
+      if (firstNameParam || middleNameParam || lastNameParam) {
+        performSearch(firstNameParam, middleNameParam, lastNameParam);
+      }
+    }
+  }, [people, searchParams, performSearch]);
+
   // Handle search when button is clicked
   const handleSearch = () => {
-    const firstNameTerm = firstName.trim().toLowerCase();
-    const middleNameTerm = middleName.trim().toLowerCase();
-    const lastNameTerm = lastName.trim().toLowerCase();
+    // Update URL with search params
+    const params = new URLSearchParams();
+    if (firstName.trim()) params.set('firstName', firstName.trim());
+    if (middleName.trim()) params.set('middleName', middleName.trim());
+    if (lastName.trim()) params.set('lastName', lastName.trim());
 
-    // Check if at least one field has input
-    if (!firstNameTerm && !middleNameTerm && !lastNameTerm) {
-      setFilteredPeople([]);
-      setHasSearched(false);
-      return;
-    }
+    router.push(`/people${params.toString() ? `?${params.toString()}` : ''}`);
 
-    setIsSearching(true);
-    setHasSearched(true);
-
-    const filtered = people.filter((person) => {
-      const personFirstName = person.firstName?.toLowerCase() || '';
-      const personMiddleName = person.middleName?.toLowerCase() || '';
-      const personLastName = person.lastName?.toLowerCase() || '';
-
-      // All specified fields must match (AND logic)
-      const firstNameMatch = !firstNameTerm || personFirstName.includes(firstNameTerm);
-      const middleNameMatch = !middleNameTerm || personMiddleName.includes(middleNameTerm);
-      const lastNameMatch = !lastNameTerm || personLastName.includes(lastNameTerm);
-
-      return firstNameMatch && middleNameMatch && lastNameMatch;
-    });
-
-    setFilteredPeople(filtered);
-    setIsSearching(false);
+    // Perform the search
+    performSearch(firstName, middleName, lastName);
   };
 
   // Handle clear all fields
@@ -92,6 +126,7 @@ export default function PeoplePage() {
     setLastName('');
     setFilteredPeople([]);
     setHasSearched(false);
+    router.push('/people'); // Clear URL params
   };
 
   // Handle Enter key press in any input field
