@@ -22,6 +22,11 @@ export type Person = {
   burial?: string;
   burialPlace?: string;
   marriageDate?: string;
+  dnaProven?: boolean;
+  hasPicture?: boolean;
+  hasFamilyBible?: boolean;
+  militaryService?: string[];
+  page?: string;
   father?: string;
   mother?: string;
   spouses: string[];

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SuggestEditButton } from '@/components';
-import { getEditPersonRecordEnabled } from '@/lib';
+import { getEditPersonRecordEnabled, getCulpepperConnectionLinkEnabled } from '@/lib';
 
 type RelatedPerson = {
   id: string;
@@ -29,6 +29,11 @@ type Person = {
   mother?: RelatedPerson;
   spouses: RelatedPerson[];
   children: RelatedPerson[];
+  dnaProven?: boolean;
+  hasPicture?: boolean;
+  hasFamilyBible?: boolean;
+  militaryService?: string[];
+  page?: string;
 };
 
 function formatPersonName(person: RelatedPerson): string {
@@ -58,6 +63,7 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const person = await getPerson(id);
   const editEnabled = await getEditPersonRecordEnabled();
+  const culpepperLinkEnabled = await getCulpepperConnectionLinkEnabled();
 
   if (!person) {
     notFound();
@@ -80,8 +86,54 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
                 ? `${person.firstName}${person.middleName ? ` ${person.middleName}` : ''} ${person.lastName}`
                 : person.name}
             </h1>
-            {editEnabled && <SuggestEditButton person={person} />}
+            <div className="flex gap-2">
+              {culpepperLinkEnabled && person.page && (
+                <a
+                  href={`https://www.culpepperconnections.com/ss/g0/${person.page}#i${person.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+                >
+                  <span>🔗</span>
+                  <span>View on CulpepperConnections</span>
+                </a>
+              )}
+              {editEnabled && <SuggestEditButton person={person} />}
+            </div>
           </div>
+
+          {/* Badge Section */}
+          {(person.dnaProven ||
+            person.hasPicture ||
+            person.hasFamilyBible ||
+            (person.militaryService && person.militaryService.length > 0)) && (
+            <div className="mb-6 flex flex-wrap gap-2">
+              {person.dnaProven && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-300">
+                  🧬 DNA Proven
+                </span>
+              )}
+              {person.hasPicture && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-300">
+                  📷 Picture Available
+                </span>
+              )}
+              {person.hasFamilyBible && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-300">
+                  📖 Family Bible Record
+                </span>
+              )}
+              {person.militaryService &&
+                person.militaryService.map((service) => (
+                  <span
+                    key={service}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-300"
+                  >
+                    🎖️ {service}
+                  </span>
+                ))}
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>

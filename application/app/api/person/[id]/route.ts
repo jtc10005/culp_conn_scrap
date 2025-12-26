@@ -51,6 +51,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         burial: node.properties.burial || undefined,
         burialPlace: node.properties.burialPlace || undefined,
         marriageDate: node.properties.marriageDate || undefined,
+        dnaProven: node.properties.dnaProven || undefined,
+        hasPicture: node.properties.hasPicture || undefined,
+        hasFamilyBible: node.properties.hasFamilyBible || undefined,
+        militaryService: node.properties.militaryService || undefined,
+        page: node.properties.page || undefined,
         father: fatherNode
           ? {
               id: fatherNode.properties.id,

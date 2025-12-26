@@ -24,6 +24,11 @@ export type Person = {
   mother?: string;
   spouses: string[];
   children: string[];
+  dnaProven?: boolean;
+  hasPicture?: boolean;
+  hasFamilyBible?: boolean;
+  militaryService?: string[]; // e.g., ["World War 2", "Civil War"]
+  page?: string; // e.g., "p1391.htm"
 };
 
 /**
@@ -49,6 +54,50 @@ export function extractPersonLinks(
   });
 
   return links;
+}
+
+/**
+ * Extract badges/markers from icon images in an element
+ */
+export function extractBadges(
+  $: cheerio.CheerioAPI,
+  root: cheerio.Cheerio<Element>
+): {
+  dnaProven: boolean;
+  hasPicture: boolean;
+  hasFamilyBible: boolean;
+  militaryService: string[];
+} {
+  const militaryService: string[] = [];
+  let dnaProven = false;
+  let hasPicture = false;
+  let hasFamilyBible = false;
+
+  root.find("img.icon").each((_idx: number, img: Element) => {
+    const src = $(img).attr("src") || "";
+
+    if (src.includes("dnah.gif")) {
+      dnaProven = true;
+    } else if (src.includes("exhibitsy.gif")) {
+      hasPicture = true;
+    } else if (src.includes("familybibley.gif")) {
+      hasFamilyBible = true;
+    } else if (src.includes("wartimesvc2.gif")) {
+      militaryService.push("World War 2");
+    } else if (src.includes("wartimesvc1.gif")) {
+      militaryService.push("World War 1");
+    } else if (src.includes("wartimesvcc.gif")) {
+      militaryService.push("Civil War");
+    } else if (src.includes("wartimesvct.gif")) {
+      militaryService.push("War of 1812");
+    } else if (src.includes("wartimesvca.gif")) {
+      militaryService.push("American Revolution");
+    } else if (src.includes("wartimesvci.gif")) {
+      militaryService.push("Indian Wars");
+    }
+  });
+
+  return { dnaProven, hasPicture, hasFamilyBible, militaryService };
 }
 
 /**
@@ -173,18 +222,30 @@ export function extractNames(fullName: string): {
  */
 export function parsePersonFromPage(
   html: string,
-  anchor: string
-): { person: Person; discovered: QueueItem[] } | null {
+  anchor: string,
+  page?: string
+): {
+  person: Person;
+  discovered: QueueItem[];
+  unlinkedChildren: Person[];
+} | null {
   const $ = cheerio.load(html);
   const discovered: QueueItem[] = [];
+  const unlinkedChildren: Person[] = [];
 
   const personDiv = $(`div.itp#${anchor}`);
   if (!personDiv.length) return null;
 
-  // Get the h2 element and remove any sup (superscript) elements before getting text
+  // Get the h2 element for name and badges
   const nameElement = personDiv.find("h2").first();
-  nameElement.find("sup").remove(); // Remove citation superscripts
-  const name = nameElement.text().trim();
+
+  // Extract badges from the h2 element (before removing sup elements)
+  const badges = extractBadges($, nameElement);
+
+  // Remove citation superscripts and get the name
+  const nameClone = nameElement.clone();
+  nameClone.find("sup").remove();
+  const name = nameClone.text().trim();
 
   const id = anchor.replace("i", "");
   const { firstName, middleName, lastName } = extractNames(name);
@@ -319,11 +380,59 @@ export function parsePersonFromPage(
 
           // Look for children
           if (label.startsWith("child")) {
-            const links = extractPersonLinks($, $(cells[1]));
+            const childCell = $(cells[1]);
+
+            // Extract linked children (those with person pages)
+            const links = extractPersonLinks($, childCell);
             for (const link of links) {
               children.push(link.id);
               discovered.push({ page: link.page, anchor: `i${link.id}` });
             }
+
+            // Extract unlinked children (plain text names without links)
+            // These are in <li> elements without <a> tags pointing to person pages
+            childCell.find("li").each((_idx: number, li: Element) => {
+              const $li = $(li);
+
+              // Check if this <li> has a link to a person page (not just citation links)
+              // Person links look like: <a href="../g0/p198.htm#i5936">
+              const hasPersonLink = $li
+                .find("a[href]")
+                .toArray()
+                .some((link) => {
+                  const href = $(link).attr("href") || "";
+                  return href.match(/p\d+\.htm#i\d+/);
+                });
+
+              if (hasPersonLink) return;
+
+              // Clone the element to avoid modifying the DOM
+              const $liClone = $li.clone();
+
+              // Extract the plain text name (remove any <sup>, <img>, etc.)
+              $liClone.find("sup, img").remove();
+              const childName = $liClone.text().trim();
+
+              if (childName) {
+                // Generate a synthetic ID for this unlinked child
+                const syntheticId = `UNLINKED_${id}_${unlinkedChildren.length}`;
+                const namesParsed = extractNames(childName);
+
+                // Create a minimal Person record for this unlinked child
+                const unlinkedChild: Person = {
+                  id: syntheticId,
+                  name: childName,
+                  ...namesParsed,
+                  ...(gender === "Male" && { father: id }),
+                  ...(gender === "Female" && { mother: id }),
+                  spouses: [],
+                  children: [],
+                };
+
+                unlinkedChildren.push(unlinkedChild);
+                children.push(syntheticId);
+              }
+            });
           }
         });
     });
@@ -347,7 +456,15 @@ export function parsePersonFromPage(
       ...(mother && { mother }),
       spouses,
       children,
+      ...(badges.dnaProven && { dnaProven: true }),
+      ...(badges.hasPicture && { hasPicture: true }),
+      ...(badges.hasFamilyBible && { hasFamilyBible: true }),
+      ...(badges.militaryService.length > 0 && {
+        militaryService: badges.militaryService,
+      }),
+      ...(page && { page }),
     },
     discovered,
+    unlinkedChildren,
   };
 }

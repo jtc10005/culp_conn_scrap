@@ -46,7 +46,12 @@ async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
            p.burialPlace = $burialPlace,
            p.marriageDate = $marriageDate,
            p.father = $father,
-           p.mother = $mother`,
+           p.mother = $mother,
+           p.dnaProven = $dnaProven,
+           p.hasPicture = $hasPicture,
+           p.hasFamilyBible = $hasFamilyBible,
+           p.militaryService = $militaryService,
+           p.page = $page`,
       {
         id: person.id,
         name: person.name,
@@ -63,6 +68,11 @@ async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
         marriageDate: person.marriageDate || null,
         father: person.father || null,
         mother: person.mother || null,
+        dnaProven: person.dnaProven || null,
+        hasPicture: person.hasPicture || null,
+        hasFamilyBible: person.hasFamilyBible || null,
+        militaryService: person.militaryService || null,
+        page: person.page || null,
       }
     );
   }
@@ -121,7 +131,8 @@ async function crawl() {
 
   const session = driver.session({ database: config.NEO4J_DATABASE });
   const visited = new Set<string>();
-  const queue: QueueItem[] = [{ page: "p1.htm", anchor: "i1" }];
+  // TEST: Start with person 41718 only
+  const queue: QueueItem[] = [{ page: "p1391.htm", anchor: "i41718" }];
   const pageCache = new Map<string, string>();
 
   const batch: Person[] = [];
@@ -165,16 +176,22 @@ async function crawl() {
       }
 
       // Parse person
-      const parsed = parsePersonFromPage(html, item.anchor);
+      const parsed = parsePersonFromPage(html, item.anchor, item.page);
       if (!parsed) {
         console.warn(`Person not found: ${key}`);
         continue;
       }
 
-      const { person, discovered } = parsed;
+      const { person, unlinkedChildren } = parsed;
+      // TEST: Not using discovered to avoid crawling related people
 
       // Add to batch
       batch.push(person);
+
+      // Add unlinked children to batch
+      if (unlinkedChildren && unlinkedChildren.length > 0) {
+        batch.push(...unlinkedChildren);
+      }
       processed++;
 
       const nameInfo =
@@ -216,12 +233,13 @@ async function crawl() {
       }
 
       // Add discovered people to queue
-      for (const disc of discovered) {
-        const discKey = `${disc.page}#${disc.anchor}`;
-        if (!visited.has(discKey)) {
-          queue.push(disc);
-        }
-      }
+      // TEST: Skip adding discovered people to only process person 41718
+      // for (const disc of discovered) {
+      //   const discKey = `${disc.page}#${disc.anchor}`;
+      //   if (!visited.has(discKey)) {
+      //     queue.push(disc);
+      //   }
+      // }
     }
 
     // Save any remaining people in the final batch

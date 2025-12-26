@@ -10,8 +10,6 @@
     "scrape": "cd scraper && npm run scrape",
     "find-missing": "cd scraper && npm run find-missing",
     "scrape:test": "cd scraper && npm run scrape:test",
-    "html-to-json": "cd scraper && npm run html-to-json",
-    "json-to-neo4j": "cd scraper && npm run json-to-neo4j",
     "dev": "cd application && npm run dev",
     "build": "cd application && npm run build",
     "start": "cd application && npm start",

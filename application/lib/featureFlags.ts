@@ -84,6 +84,14 @@ export async function getEditPersonRecordEnabled(): Promise<boolean> {
 }
 
 /**
+ * Get CulpepperConnection link feature flag
+ * Controls whether to show links to the original CulpepperConnections.com pages
+ */
+export async function getCulpepperConnectionLinkEnabled(): Promise<boolean> {
+  return getFeatureFlag('culpepperConnectionLink', false);
+}
+
+/**
  * Close ConfigCat client (call on app shutdown)
  */
 export function closeConfigCat() {

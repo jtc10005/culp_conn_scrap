@@ -21,6 +21,11 @@ export type Person = {
   mother?: string;
   spouses: string[];
   children: string[];
+  dnaProven?: boolean;
+  hasPicture?: boolean;
+  hasFamilyBible?: boolean;
+  militaryService?: string[];
+  page?: string;
 };
 
 export type QueueItem = {
