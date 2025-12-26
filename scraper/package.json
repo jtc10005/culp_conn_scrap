@@ -16,7 +16,9 @@
   "main": "index.js",
   "scripts": {
     "scrape": "cls && tsx scraper.ts",
-    "find-missing": "cls && tsx find-missing.ts"
+    "find-missing": "cls && tsx find-missing.ts",
+    "html-to-json": "cls && tsx html-to-json.ts",
+    "json-to-neo4j": "cls && tsx json-to-neo4j.ts"
   },
   "dependencies": {
     "axios": "^1.13.2",

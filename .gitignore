@@ -31,7 +31,8 @@ out/
 
 # Data
 *.htm
-data/
+data/*.htm
+genealogy-data.json
 
 # TypeScript
 *.tsbuildinfo

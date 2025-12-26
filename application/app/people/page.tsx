@@ -19,29 +19,13 @@ interface Person {
 export default function PeoplePage() {
   const [people, setPeople] = useState<Person[]>([]);
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [middleName, setMiddleName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Debounce search term
-  useEffect(() => {
-    if (searchTerm === '') {
-      setDebouncedSearchTerm('');
-      setIsSearching(false);
-      return;
-    }
-
-    setIsSearching(true);
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-      setIsSearching(false);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
 
   // Fetch all people on mount for client-side filtering
   useEffect(() => {
@@ -68,35 +52,54 @@ export default function PeoplePage() {
     fetchPeople();
   }, []);
 
-  useEffect(() => {
-    if (debouncedSearchTerm.trim() === '') {
+  // Handle search when button is clicked
+  const handleSearch = () => {
+    const firstNameTerm = firstName.trim().toLowerCase();
+    const middleNameTerm = middleName.trim().toLowerCase();
+    const lastNameTerm = lastName.trim().toLowerCase();
+
+    // Check if at least one field has input
+    if (!firstNameTerm && !middleNameTerm && !lastNameTerm) {
       setFilteredPeople([]);
       setHasSearched(false);
-    } else {
-      setHasSearched(true);
-      const term = debouncedSearchTerm.toLowerCase();
-      const filtered = people.filter((person) => {
-        const fullName = person.name.toLowerCase();
-        const firstName = person.firstName?.toLowerCase() || '';
-        const middleName = person.middleName?.toLowerCase() || '';
-        const lastName = person.lastName?.toLowerCase() || '';
-        const birthPlace = person.birthPlace?.toLowerCase() || '';
-        const deathPlace = person.deathPlace?.toLowerCase() || '';
-        const id = person.id.toLowerCase();
-
-        return (
-          fullName.includes(term) ||
-          firstName.includes(term) ||
-          middleName.includes(term) ||
-          lastName.includes(term) ||
-          birthPlace.includes(term) ||
-          deathPlace.includes(term) ||
-          id.includes(term)
-        );
-      });
-      setFilteredPeople(filtered);
+      return;
     }
-  }, [debouncedSearchTerm, people]);
+
+    setIsSearching(true);
+    setHasSearched(true);
+
+    const filtered = people.filter((person) => {
+      const personFirstName = person.firstName?.toLowerCase() || '';
+      const personMiddleName = person.middleName?.toLowerCase() || '';
+      const personLastName = person.lastName?.toLowerCase() || '';
+
+      // All specified fields must match (AND logic)
+      const firstNameMatch = !firstNameTerm || personFirstName.includes(firstNameTerm);
+      const middleNameMatch = !middleNameTerm || personMiddleName.includes(middleNameTerm);
+      const lastNameMatch = !lastNameTerm || personLastName.includes(lastNameTerm);
+
+      return firstNameMatch && middleNameMatch && lastNameMatch;
+    });
+
+    setFilteredPeople(filtered);
+    setIsSearching(false);
+  };
+
+  // Handle clear all fields
+  const handleClear = () => {
+    setFirstName('');
+    setMiddleName('');
+    setLastName('');
+    setFilteredPeople([]);
+    setHasSearched(false);
+  };
+
+  // Handle Enter key press in any input field
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   if (loading) {
     return (
@@ -137,69 +140,138 @@ export default function PeoplePage() {
           </p>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Form */}
         <div className="mb-6">
-          <div className="relative max-w-2xl">
-            <input
-              type="text"
-              placeholder="Search by name, ID, place, or any keyword..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-12 theme-bg-secondary theme-text-primary theme-border border-2 rounded-lg focus:outline-none focus:border-heritage-primary transition-colors"
-            />
-            {isSearching ? (
-              <div className="absolute left-3 top-3.5">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-heritage-primary"></div>
-              </div>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6 absolute left-3 top-3.5 theme-text-tertiary"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            )}
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-3.5 theme-text-tertiary hover:theme-text-primary transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6"
+          <div className="max-w-4xl theme-bg-secondary theme-border border-2 rounded-lg p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* First Name */}
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium theme-text-primary mb-2"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                  First Name
+                </label>
+                <input
+                  id="firstName"
+                  type="text"
+                  placeholder="e.g., Henry"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="w-full px-4 py-2 theme-bg-tertiary theme-text-primary theme-border border rounded-lg focus:outline-none focus:border-heritage-primary transition-colors"
+                />
+              </div>
+
+              {/* Middle Name */}
+              <div>
+                <label
+                  htmlFor="middleName"
+                  className="block text-sm font-medium theme-text-primary mb-2"
+                >
+                  Middle Name
+                </label>
+                <input
+                  id="middleName"
+                  type="text"
+                  placeholder="e.g., James"
+                  value={middleName}
+                  onChange={(e) => setMiddleName(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="w-full px-4 py-2 theme-bg-tertiary theme-text-primary theme-border border rounded-lg focus:outline-none focus:border-heritage-primary transition-colors"
+                />
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium theme-text-primary mb-2"
+                >
+                  Last Name
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  placeholder="e.g., Culpepper"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="w-full px-4 py-2 theme-bg-tertiary theme-text-primary theme-border border rounded-lg focus:outline-none focus:border-heritage-primary transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Search Buttons */}
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handleSearch}
+                disabled={isSearching}
+                style={{ backgroundColor: 'var(--heritage-primary)', color: 'white' }}
+                className="px-6 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md"
+              >
+                {isSearching ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                      />
+                    </svg>
+                    Search
+                  </>
+                )}
               </button>
-            )}
+
+              <button
+                onClick={handleClear}
+                className="px-6 py-2 theme-bg-tertiary theme-text-primary theme-border border rounded-lg hover:theme-bg-primary transition-colors font-medium shadow-md"
+              >
+                Clear
+              </button>
+            </div>
+
+            {/* Search Instructions */}
+            <div className="mt-4 pt-4 border-t theme-border">
+              <p className="text-sm theme-text-secondary">
+                💡 <strong>Search Tips:</strong> Fill in one or more fields to narrow your search.
+                All specified fields must match (e.g., searching for &ldquo;Henry&rdquo; +
+                &ldquo;Culpepper&rdquo; will only show people with both names). Press Enter or click
+                Search to find results.
+              </p>
+            </div>
           </div>
-          {hasSearched ? (
-            <p className="mt-2 theme-text-tertiary text-sm">
-              {isSearching ? (
-                <span>Searching...</span>
-              ) : (
-                <span>
-                  {filteredPeople.length} {filteredPeople.length === 1 ? 'person' : 'people'} found
-                </span>
-              )}
-            </p>
-          ) : (
-            <p className="mt-2 theme-text-secondary text-sm">
-              💡 Enter a name, ID number, or location to search. Try searching for
-              &ldquo;Henry&rdquo;, &ldquo;1&rdquo;, or &ldquo;Virginia&rdquo;
-            </p>
+
+          {/* Results Count */}
+          {hasSearched && (
+            <div className="mt-4 text-center">
+              <p className="theme-text-primary text-lg font-medium">
+                {isSearching ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-heritage-primary"></div>
+                    Searching...
+                  </span>
+                ) : (
+                  <span>
+                    Found {filteredPeople.length}{' '}
+                    {filteredPeople.length === 1 ? 'person' : 'people'}
+                  </span>
+                )}
+              </p>
+            </div>
           )}
         </div>
 
@@ -223,19 +295,20 @@ export default function PeoplePage() {
               </svg>
               {!hasSearched ? (
                 <>
-                  <h3 className="text-xl font-semibold theme-text-primary mb-2">Start Searching</h3>
+                  <h3 className="text-xl font-semibold theme-text-primary mb-2">Ready to Search</h3>
                   <p className="theme-text-secondary mb-4">
-                    Enter a search term above to find people in the family tree.
+                    Use the search form above to find people by first name, middle name, or last
+                    name.
                   </p>
                   <div className="max-w-md mx-auto theme-bg-tertiary p-4 rounded-lg theme-border border">
                     <p className="text-sm theme-text-secondary text-left mb-2">
-                      <strong className="theme-text-primary">Search by:</strong>
+                      <strong className="theme-text-primary">How to search:</strong>
                     </p>
                     <ul className="text-sm theme-text-secondary text-left space-y-1">
-                      <li>• First name, last name, or full name</li>
-                      <li>• ID number (e.g., &ldquo;1&rdquo;, &ldquo;834&rdquo;)</li>
-                      <li>• Birth or death location</li>
-                      <li>• Any keyword</li>
+                      <li>• Enter one or more name fields</li>
+                      <li>• All specified fields must match</li>
+                      <li>• Partial matches are supported</li>
+                      <li>• Click Search or press Enter</li>
                     </ul>
                   </div>
                 </>
