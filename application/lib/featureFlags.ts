@@ -16,9 +16,17 @@ export interface NavigationConfig {
   tree: boolean;
   history: boolean;
   people: boolean;
+  bulletinBoard: boolean;
   acknowledgements: boolean;
   practice: boolean;
   about: boolean;
+}
+
+export interface LoginMethodsConfig {
+  facebook: boolean;
+  X: boolean;
+  google: boolean;
+  apple: boolean;
 }
 
 // Default navigation config (fallback if ConfigCat fails)
@@ -26,9 +34,18 @@ const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
   tree: true,
   history: true,
   people: true,
+  bulletinBoard: true,
   acknowledgements: true,
   practice: true,
   about: false,
+};
+
+// Default login methods config (fallback if ConfigCat fails)
+const DEFAULT_LOGIN_METHODS_CONFIG: LoginMethodsConfig = {
+  facebook: false,
+  X: false,
+  google: false,
+  apple: false,
 };
 
 /**
@@ -49,6 +66,27 @@ export async function getNavigationConfig(): Promise<NavigationConfig> {
   } catch (error) {
     console.error('Error fetching navigation config from ConfigCat:', error);
     return DEFAULT_NAVIGATION_CONFIG;
+  }
+}
+
+/**
+ * Get login methods configuration from ConfigCat
+ * Uses a text setting that contains a JSON string
+ */
+export async function getLoginMethodsConfig(): Promise<LoginMethodsConfig> {
+  try {
+    // Get the text setting from ConfigCat
+    const configText = await configCatClient.getValueAsync(
+      'loginMethods',
+      JSON.stringify(DEFAULT_LOGIN_METHODS_CONFIG)
+    );
+
+    // Parse the JSON string
+    const config = JSON.parse(configText as string);
+    return config as LoginMethodsConfig;
+  } catch (error) {
+    console.error('Error fetching login methods config from ConfigCat:', error);
+    return DEFAULT_LOGIN_METHODS_CONFIG;
   }
 }
 

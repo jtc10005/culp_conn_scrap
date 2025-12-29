@@ -70,6 +70,12 @@ export default function Header() {
               People
             </Link>
             <Link
+              href="/bulletin-board"
+              className="theme-banner-text theme-banner-text-hover transition-colors font-medium"
+            >
+              Bulletin Board
+            </Link>
+            <Link
               href="/acknowledgements"
               className="theme-banner-text theme-banner-text-hover transition-colors font-medium"
             >
@@ -176,6 +182,13 @@ export default function Header() {
                     className="block px-4 py-3 rounded-lg theme-text-primary hover:theme-bg-tertiary transition-colors font-medium"
                   >
                     👥 People
+                  </Link>
+                  <Link
+                    href="/bulletin-board"
+                    onClick={closeMenu}
+                    className="block px-4 py-3 rounded-lg theme-text-primary hover:theme-bg-tertiary transition-colors font-medium"
+                  >
+                    💬 Bulletin Board
                   </Link>
                   <Link
                     href="/acknowledgements"

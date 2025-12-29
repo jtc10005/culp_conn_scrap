@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Tangerine } from 'next/font/google';
 import './globals.css';
 import { HeaderWithFlags as Header } from '@/components';
 import { getCalligraphicFontEnabled } from '@lib';
+import { AuthProvider } from '@/lib/auth';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -53,9 +54,11 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={fontClasses}>
-        <Header />
-        {children}
+      <body className={`${fontClasses} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
+        <AuthProvider>
+          <Header />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

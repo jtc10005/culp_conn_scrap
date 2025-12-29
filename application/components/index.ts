@@ -1,4 +1,5 @@
 // Barrel export file for components
+export { default as AuthModal } from './AuthModal';
 export { BackButton } from './BackButton';
 export { default as DarkModeToggle } from './DarkModeToggle';
 export { default as FamilyTree } from './FamilyTree';

@@ -8,6 +8,7 @@ interface MobileMenuProps {
     tree?: boolean;
     history?: boolean;
     people?: boolean;
+    bulletinBoard?: boolean;
     acknowledgements?: boolean;
     about?: boolean;
     practice?: boolean;
@@ -116,6 +117,15 @@ export default function MobileMenu({ navConfig, navLinkFontClasses }: MobileMenu
                 className={`block px-4 py-3 rounded-lg theme-text-primary hover:theme-bg-tertiary transition-colors ${navLinkFontClasses}`}
               >
                 People
+              </Link>
+            )}
+            {navConfig.bulletinBoard && (
+              <Link
+                href="/bulletin-board"
+                onClick={closeMenu}
+                className={`block px-4 py-3 rounded-lg theme-text-primary hover:theme-bg-tertiary transition-colors ${navLinkFontClasses}`}
+              >
+                Bulletin Board
               </Link>
             )}
             {navConfig.acknowledgements && (

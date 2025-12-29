@@ -52,6 +52,14 @@ export default async function Header() {
                 People
               </Link>
             )}
+            {navConfig.bulletinBoard && (
+              <Link
+                href="/bulletin-board"
+                className={`theme-banner-text theme-banner-text-hover transition-colors ${navLinkFontClasses}`}
+              >
+                Bulletin Board
+              </Link>
+            )}
             {navConfig.acknowledgements && (
               <Link
                 href="/acknowledgements"

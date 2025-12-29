@@ -28,6 +28,7 @@ In your ConfigCat dashboard:
      "tree": true,
      "history": true,
      "people": true,
+     "bulletinBoard": true,
      "acknowledgements": true,
      "practice": true,
      "about": false
@@ -36,7 +37,28 @@ In your ConfigCat dashboard:
 
    **Important**: ConfigCat uses text settings for JSON data. Make sure to enter the JSON on a single line without extra whitespace.
 
-### 2. Create Calligraphic Font Flag
+### 2. Create Login Methods Config Setting
+
+1. Go to **Feature Flags & Settings**
+2. Click **Add Setting**
+3. Create a setting with these details:
+   - **Key**: `loginMethods`
+   - **Name**: Login Methods Configuration
+   - **Type**: **Text** (we store JSON as a string)
+   - **Default Value** (single line, no whitespace):
+
+   ```json
+   {
+     "facebook": false,
+     "X": false,
+     "google": false,
+     "apple": false
+   }
+   ```
+
+   This controls which social login buttons are displayed on the bulletin board authentication modal. Set each provider to `true` only after configuring OAuth in Supabase.
+
+### 3. Create Calligraphic Font Flag
 
 1. Go to **Feature Flags & Settings**
 2. Click **Add Setting**
@@ -55,16 +77,26 @@ In your ConfigCat dashboard:
 - `tree` - Show/hide Family Tree navigation and route
 - `history` - Show/hide Family History navigation and route
 - `people` - Show/hide Browse People navigation and route
+- `bulletinBoard` - Show/hide Bulletin Board navigation and route
 - `acknowledgements` - Show/hide Credits navigation and route
 - `practice` - Show/hide SVG Practice navigation and route
 - `about` - Show/hide About page navigation and route
+
+**Login Methods (`loginMethods` - Text/JSON):**
+
+- `facebook` - Show/hide Facebook login button
+- `X` - Show/hide X (Twitter) login button
+- `google` - Show/hide Google login button
+- `apple` - Show/hide Apple login button
+
+When all providers are set to `false`, the entire social login section is hidden.
 
 **Calligraphic Font (`calligraphic_font` - Boolean):**
 
 - `true` - Apply Tangerine calligraphic font to all text site-wide
 - `false` - Use standard Geist fonts (default)
 
-### 2. Get Your SDK Key
+### 4. Get Your SDK Key
 
 1. Go to **Settings** → **SDK Keys**
 2. Copy your **SDK Key**

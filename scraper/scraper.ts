@@ -32,8 +32,8 @@ const SKIP_NEO4J_SAVE =
 const MAX_RECORDS = config.MAX_RECORDS || null; // null = no limit
 const SAVE_HTML = config.SAVE_HTML !== undefined ? config.SAVE_HTML : true; // Save HTML files by default
 const EXTRACT_EVENTS_TO_SUPABASE =
-  config.ExtractEventsToSupaBase !== undefined
-    ? config.ExtractEventsToSupaBase
+  config.EXTRACT_EVENTS_TO_SUPABASE !== undefined
+    ? config.EXTRACT_EVENTS_TO_SUPABASE
     : false;
 
 // Create data directory if it doesn't exist
