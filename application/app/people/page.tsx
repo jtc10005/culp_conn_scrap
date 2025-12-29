@@ -489,14 +489,16 @@ function PeoplePageContent() {
 
 export default function PeoplePage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen theme-bg-primary theme-text-primary flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-heritage-primary mx-auto mb-4"></div>
-          <p className="text-xl">Loading search...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen theme-bg-primary theme-text-primary flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-heritage-primary mx-auto mb-4"></div>
+            <p className="text-xl">Loading search...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <PeoplePageContent />
     </Suspense>
   );

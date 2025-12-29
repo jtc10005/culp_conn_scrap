@@ -6,6 +6,31 @@ export type QueueItem = {
   anchor: string;
 };
 
+export type LifeEvent = {
+  type:
+    | "birth"
+    | "death"
+    | "burial"
+    | "baptism"
+    | "residence"
+    | "occupation"
+    | "immigration"
+    | "military"
+    | "other";
+  date?: string;
+  place?: string;
+  description?: string;
+};
+
+export type Family = {
+  spouseId?: string; // ID of spouse, undefined if unknown
+  spouseName?: string; // Name of spouse if not linked
+  marriageDate?: string;
+  marriagePlace?: string;
+  divorceDate?: string;
+  childrenIds: string[]; // IDs of children from this marriage
+};
+
 export type Person = {
   id: string;
   name: string;
@@ -13,17 +38,17 @@ export type Person = {
   middleName?: string;
   lastName?: string;
   gender?: string;
-  birth?: string;
-  birthPlace?: string;
-  death?: string;
-  deathPlace?: string;
-  burial?: string;
-  burialPlace?: string;
-  marriageDate?: string;
+  birth?: string; // Keep for backward compatibility
+  birthPlace?: string; // Keep for backward compatibility
+  death?: string; // Keep for backward compatibility
+  deathPlace?: string; // Keep for backward compatibility
+  burial?: string; // Keep for backward compatibility
+  burialPlace?: string; // Keep for backward compatibility
+  marriageDate?: string; // Keep primary marriage for backward compatibility
   father?: string;
   mother?: string;
-  spouses: string[];
-  children: string[];
+  spouses: string[]; // Keep for backward compatibility
+  children: string[]; // All children from all marriages
   dnaProven?: boolean;
   hasPicture?: boolean;
   hasFamilyBible?: boolean;
@@ -228,6 +253,8 @@ export function parsePersonFromPage(
   person: Person;
   discovered: QueueItem[];
   unlinkedChildren: Person[];
+  events: LifeEvent[];
+  families: Family[];
 } | null {
   const $ = cheerio.load(html);
   const discovered: QueueItem[] = [];
@@ -241,6 +268,12 @@ export function parsePersonFromPage(
 
   // Extract badges from the h2 element (before removing sup elements)
   const badges = extractBadges($, nameElement);
+
+  // Extract all life events from the biographical table
+  const events = extractLifeEvents($, personDiv);
+
+  // Extract all families (marriages) from family tables
+  const families = extractFamilies($, personDiv, discovered);
 
   // Remove citation superscripts and get the name
   const nameClone = nameElement.clone();
@@ -466,5 +499,174 @@ export function parsePersonFromPage(
     },
     discovered,
     unlinkedChildren,
+    events,
+    families,
   };
+}
+
+/**
+ * Extract all life events from a person's biographical table
+ */
+export function extractLifeEvents(
+  $: cheerio.CheerioAPI,
+  personDiv: cheerio.Cheerio<Element>
+): LifeEvent[] {
+  const events: LifeEvent[] = [];
+
+  // Find the main biographical table (not ss-parents or ss-family)
+  personDiv
+    .find("table.grid")
+    .not(".ss-parents")
+    .not(".ss-family")
+    .first()
+    .find("tr")
+    .each((_: number, row: Element) => {
+      const cells = $(row).find("td");
+      if (cells.length < 2) return;
+
+      const label = $(cells[0]).text().toLowerCase().trim();
+      const date = cleanDateString($(cells[1]).text());
+      const description = cells.length > 2 ? $(cells[2]).text().trim() : "";
+
+      // Extract place from description (usually mentions "at [place]")
+      const placeMatch = description.match(
+        /\bat\s+([^,]+(?:,\s*[A-Z][a-z\s]+)?)\s*[,.]?/i
+      );
+      const place = placeMatch?.[1]?.trim().replace(/[,.;]+$/, "");
+
+      // Map label to event type
+      let type: LifeEvent["type"] = "other";
+      if (label.startsWith("birth")) {
+        type = "birth";
+      } else if (label.startsWith("death")) {
+        type = "death";
+      } else if (label.startsWith("burial")) {
+        type = "burial";
+      } else if (
+        label.startsWith("baptism") ||
+        label.startsWith("christening")
+      ) {
+        type = "baptism";
+      } else if (label.startsWith("residence") || label.startsWith("lived")) {
+        type = "residence";
+      } else if (label.startsWith("occupation") || label.startsWith("work")) {
+        type = "occupation";
+      } else if (label.startsWith("immigr") || label.startsWith("emigr")) {
+        type = "immigration";
+      } else if (label.startsWith("military") || label.startsWith("service")) {
+        type = "military";
+      } else if (label.startsWith("marriage") || label.startsWith("married")) {
+        // Skip marriages - they're handled in Family extraction
+        return;
+      }
+
+      events.push({
+        type,
+        ...(date && { date }),
+        ...(place && { place }),
+        ...(description && { description }),
+      });
+    });
+
+  return events;
+}
+
+/**
+ * Extract all families (marriages) from a person's family tables
+ */
+export function extractFamilies(
+  $: cheerio.CheerioAPI,
+  personDiv: cheerio.Cheerio<Element>,
+  discovered: QueueItem[]
+): Family[] {
+  const families: Family[] = [];
+
+  // Find ALL family tables (handles remarriages)
+  personDiv
+    .find("table.grid.ss-family")
+    .each((_tableIndex: number, table: Element) => {
+      const family: Family = {
+        childrenIds: [],
+      };
+
+      // Process all rows in this family table
+      $(table)
+        .find("tr")
+        .each((_rowIndex: number, row: Element) => {
+          const cells = $(row).find("td");
+          if (cells.length < 2) return;
+
+          const label = $(cells[0]).text().toLowerCase().trim();
+
+          // Spouse information
+          if (label.includes("family") || label.includes("spouse")) {
+            const spouseCell = $(cells[1]);
+            const spouseLinks = extractPersonLinks($, spouseCell);
+
+            if (spouseLinks.length > 0 && spouseLinks[0]) {
+              family.spouseId = spouseLinks[0].id;
+              discovered.push({
+                page: spouseLinks[0].page,
+                anchor: `i${spouseLinks[0].id}`,
+              });
+            } else {
+              // Extract spouse name from text if not linked
+              const spouseClone = spouseCell.clone();
+              spouseClone.find("sup, img").remove();
+              const spouseName = spouseClone.text().trim();
+              if (spouseName && spouseName !== "Unknown") {
+                family.spouseName = spouseName;
+              }
+            }
+          }
+
+          // Marriage information
+          if (label.startsWith("marriage") || label.startsWith("married")) {
+            const date = cleanDateString($(cells[1]).text());
+            if (date) {
+              family.marriageDate = date;
+            }
+
+            const fullText = cells.length > 2 ? $(cells[2]).text().trim() : "";
+            const placeMatch = fullText.match(
+              /\bat\s+([^,]+(?:,\s*[A-Z][a-z\s]+)?)\s*[,.]?/i
+            );
+            if (placeMatch?.[1]) {
+              family.marriagePlace = placeMatch[1]
+                .trim()
+                .replace(/[,.;]+$/, "");
+            }
+          }
+
+          // Divorce information
+          if (label.startsWith("divorce")) {
+            const date = cleanDateString($(cells[1]).text());
+            if (date) {
+              family.divorceDate = date;
+            }
+          }
+
+          // Children
+          if (label.startsWith("child")) {
+            const childCell = $(cells[1]);
+            const childLinks = extractPersonLinks($, childCell);
+
+            for (const link of childLinks) {
+              family.childrenIds.push(link.id);
+              discovered.push({ page: link.page, anchor: `i${link.id}` });
+            }
+          }
+        });
+
+      // Only add family if it has spouse info or children
+      if (
+        family.spouseId ||
+        family.spouseName ||
+        family.childrenIds.length > 0
+      ) {
+        families.push(family);
+      }
+    });
+
+  return families;
 }

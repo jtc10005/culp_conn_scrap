@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { BackButton, SuggestEditButton } from '@/components';
+import { BackButton, SuggestEditButton, Timeline } from '@/components';
 import { getEditPersonRecordEnabled, getCulpepperConnectionLinkEnabled } from '@/lib';
+import type { LifeEvent, Family } from '@/lib/types';
 
 type RelatedPerson = {
   id: string;
@@ -34,6 +35,8 @@ type Person = {
   hasFamilyBible?: boolean;
   militaryService?: string[];
   page?: string;
+  events: LifeEvent[];
+  families: Family[];
 };
 
 function formatPersonName(person: RelatedPerson): string {
@@ -250,6 +253,9 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
               )}
             </div>
           </div>
+
+          {/* Timeline Section - Events and Families */}
+          <Timeline events={person.events} families={person.families} />
         </div>
       </div>
     </div>

@@ -19,6 +19,7 @@
     "find-missing": "cls && tsx find-missing.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.89.0",
     "axios": "^1.13.2",
     "cheerio": "^1.1.2",
     "neo4j-driver": "^6.0.1"

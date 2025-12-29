@@ -1,7 +1,14 @@
 import axios from "axios";
 import neo4j from "neo4j-driver";
 import * as fs from "fs";
-import { parsePersonFromPage, type Person, type QueueItem } from "./utils.js";
+import { createClient } from "@supabase/supabase-js";
+import {
+  parsePersonFromPage,
+  type Person,
+  type QueueItem,
+  type LifeEvent,
+  type Family,
+} from "./utils.js";
 
 const BASE_URL = "https://www.culpepperconnections.com/ss/g0/";
 
@@ -12,12 +19,22 @@ const driver = neo4j.driver(
   neo4j.auth.basic(config.NEO4J_USER, config.NEO4J_PASSWORD)
 );
 
+// Initialize Supabase client for storing events and families
+const supabase = createClient(
+  config.SUPABASE_URL,
+  config.SUPABASE_SERVICE_ROLE_KEY
+);
+
 // Scraper configuration from env.json
 const BATCH_SIZE = config.BATCH_SIZE || 300;
 const SKIP_NEO4J_SAVE =
   config.SKIP_NEO4J_SAVE !== undefined ? config.SKIP_NEO4J_SAVE : false;
 const MAX_RECORDS = config.MAX_RECORDS || null; // null = no limit
 const SAVE_HTML = config.SAVE_HTML !== undefined ? config.SAVE_HTML : true; // Save HTML files by default
+const EXTRACT_EVENTS_TO_SUPABASE =
+  config.ExtractEventsToSupaBase !== undefined
+    ? config.ExtractEventsToSupaBase
+    : false;
 
 // Create data directory if it doesn't exist
 const DATA_DIR = "./data";
@@ -26,11 +43,19 @@ if (SAVE_HTML && !fs.existsSync(DATA_DIR)) {
   console.log(`Created data directory: ${DATA_DIR}`);
 }
 
-// COMMENTED OUT FOR TESTING - Uncomment when ready to save to Neo4j
-// Now controlled by SKIP_NEO4J_SAVE in env.json
-async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
-  // Save all person nodes in the batch
-  for (const person of people) {
+// HYBRID ARCHITECTURE: Save Person nodes to Neo4j, Events/Families to Supabase
+async function saveBatch(
+  session: neo4j.Session,
+  batch: Array<{
+    person: Person;
+    events: LifeEvent[];
+    families: Family[];
+    unlinkedChildren: Person[];
+  }>
+) {
+  // Save all person nodes to Neo4j (basic info only)
+  for (const item of batch) {
+    const person = item.person;
     await session.run(
       `MERGE (p:Person {id: $id})
        SET p.name = $name,
@@ -75,10 +100,126 @@ async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
         page: person.page || null,
       }
     );
+
+    // Save unlinked children to Neo4j
+    for (const child of item.unlinkedChildren) {
+      await session.run(
+        `MERGE (p:Person {id: $id})
+         SET p.name = $name,
+             p.firstName = $firstName,
+             p.middleName = $middleName,
+             p.lastName = $lastName,
+             p.gender = $gender,
+             p.father = $father,
+             p.mother = $mother`,
+        {
+          id: child.id,
+          name: child.name,
+          firstName: child.firstName || null,
+          middleName: child.middleName || null,
+          lastName: child.lastName || null,
+          gender: child.gender || null,
+          father: child.father || null,
+          mother: child.mother || null,
+        }
+      );
+    }
   }
 
-  // Save all relationships in the batch
-  for (const person of people) {
+  // Save life events to Supabase (NOT Neo4j - saves space!)
+  // Only save to Supabase if ExtractEventsToSupaBase flag is enabled
+  if (EXTRACT_EVENTS_TO_SUPABASE) {
+    const eventsToInsert = [];
+    for (const item of batch) {
+      for (let i = 0; i < item.events.length; i++) {
+        const event = item.events[i]!;
+        eventsToInsert.push({
+          id: `${item.person.id}_event_${i}`,
+          person_id: item.person.id,
+          type: event.type,
+          date: event.date || null,
+          place: event.place || null,
+          description: event.description || null,
+          order_index: i,
+        });
+      }
+    }
+
+    if (eventsToInsert.length > 0) {
+      const { error: eventsError } = await supabase
+        .from("life_events")
+        .upsert(eventsToInsert, { onConflict: "id" });
+
+      if (eventsError) {
+        console.error("Error saving events to Supabase:", eventsError);
+        throw eventsError;
+      }
+    }
+  }
+
+  // Save families to Supabase (NOT Neo4j - saves space!)
+  // Only save to Supabase if ExtractEventsToSupaBase flag is enabled
+  if (EXTRACT_EVENTS_TO_SUPABASE) {
+    const familiesToInsert = [];
+    const childrenToInsert = [];
+
+    for (const item of batch) {
+      for (let i = 0; i < item.families.length; i++) {
+        const family = item.families[i]!;
+        const familyId = `${item.person.id}_family_${i}`;
+
+        familiesToInsert.push({
+          id: familyId,
+          person_id: item.person.id,
+          spouse_id: family.spouseId || null,
+          spouse_name: family.spouseName || null,
+          marriage_date: family.marriageDate || null,
+          marriage_place: family.marriagePlace || null,
+          divorce_date: family.divorceDate || null,
+          order_index: i,
+        });
+
+        // Add children for this family
+        for (let j = 0; j < family.childrenIds.length; j++) {
+          childrenToInsert.push({
+            family_id: familyId,
+            child_id: family.childrenIds[j],
+            order_index: j,
+          });
+        }
+      }
+    }
+
+    if (familiesToInsert.length > 0) {
+      const { error: familiesError } = await supabase
+        .from("families")
+        .upsert(familiesToInsert, { onConflict: "id" });
+
+      if (familiesError) {
+        console.error("Error saving families to Supabase:", familiesError);
+        throw familiesError;
+      }
+    }
+
+    if (childrenToInsert.length > 0) {
+      const { error: childrenError } = await supabase
+        .from("family_children")
+        .upsert(childrenToInsert, { onConflict: "family_id,child_id" });
+
+      if (childrenError) {
+        console.error(
+          "Error saving family children to Supabase:",
+          childrenError
+        );
+        throw childrenError;
+      }
+    }
+  }
+
+  // Save all relationships to Neo4j
+  for (const item of batch) {
+    const person = item.person;
+
     // MERGE spouse relationships (bidirectional, no duplicates)
     for (const spouseId of person.spouses) {
       await session.run(
@@ -132,8 +273,18 @@ async function saveBatchToNeo4j(session: neo4j.Session, people: Person[]) {
 async function crawl() {
   console.log("Starting crawl with batch saving...");
   console.log(
-    `📊 Configuration: BATCH_SIZE=${BATCH_SIZE}, SKIP_NEO4J=${SKIP_NEO4J_SAVE}, MAX_RECORDS=${MAX_RECORDS || "unlimited"}, SAVE_HTML=${SAVE_HTML}\n`
+    `📊 Configuration: BATCH_SIZE=${BATCH_SIZE}, SKIP_NEO4J=${SKIP_NEO4J_SAVE}, MAX_RECORDS=${MAX_RECORDS || "unlimited"}, SAVE_HTML=${SAVE_HTML}, EXTRACT_EVENTS_TO_SUPABASE=${EXTRACT_EVENTS_TO_SUPABASE}\n`
   );
+
+  if (!EXTRACT_EVENTS_TO_SUPABASE) {
+    console.log(
+      "⚠️  ExtractEventsToSupaBase is FALSE - Events and Families will NOT be saved to Supabase\n"
+    );
+  } else {
+    console.log(
+      "✓ ExtractEventsToSupaBase is TRUE - Events and Families will be saved to Supabase\n"
+    );
+  }
 
   const session = driver.session({ database: config.NEO4J_DATABASE });
   const visited = new Set<string>();
@@ -147,7 +298,12 @@ async function crawl() {
 
   const pageCache = new Map<string, string>();
 
-  const batch: Person[] = [];
+  const batch: Array<{
+    person: Person;
+    events: LifeEvent[];
+    families: Family[];
+    unlinkedChildren: Person[];
+  }> = [];
   let processed = 0;
 
   try {
@@ -194,15 +350,16 @@ async function crawl() {
         continue;
       }
 
-      const { person, unlinkedChildren, discovered } = parsed;
+      const { person, unlinkedChildren, discovered, events, families } = parsed;
 
-      // Add to batch
-      batch.push(person);
+      // Add to batch with all related data
+      batch.push({
+        person,
+        events,
+        families,
+        unlinkedChildren,
+      });
 
-      // Add unlinked children to batch
-      if (unlinkedChildren && unlinkedChildren.length > 0) {
-        batch.push(...unlinkedChildren);
-      }
       processed++;
 
       const nameInfo =
@@ -224,7 +381,7 @@ async function crawl() {
           : "";
 
       console.log(
-        `[${processed}] ${person.name}${nameInfo}${genderInfo} (ID: ${person.id})${birthInfo}${birthPlaceInfo}${deathInfo}${deathPlaceInfo}${burialInfo}${marriageInfo}${parentsInfo} | spouses=${person.spouses.length} children=${person.children.length} | queue=${queue.length} | batch=${batch.length}`
+        `[${processed}] ${person.name}${nameInfo}${genderInfo} (ID: ${person.id})${birthInfo}${birthPlaceInfo}${deathInfo}${deathPlaceInfo}${burialInfo}${marriageInfo}${parentsInfo} | spouses=${person.spouses.length} children=${person.children.length} | events=${events.length} families=${families.length} | queue=${queue.length} | batch=${batch.length}`
       );
 
       // Save batch when it reaches BATCH_SIZE
@@ -237,7 +394,7 @@ async function crawl() {
           console.log(
             `\n💾 Saving batch of ${batch.length} people to Neo4j...`
           );
-          await saveBatchToNeo4j(session, batch);
+          await saveBatch(session, batch);
           console.log("✓ Batch saved\n");
         }
         batch.length = 0; // Clear batch
@@ -270,7 +427,7 @@ async function crawl() {
         console.log(
           `\n💾 Saving final batch of ${batch.length} people to Neo4j...`
         );
-        await saveBatchToNeo4j(session, batch);
+        await saveBatch(session, batch);
         console.log("✓ Final batch saved");
       }
     }

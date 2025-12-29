@@ -7,4 +7,5 @@ export { default as HeaderWithFlags } from './HeaderWithFlags';
 export { default as MobileMenu } from './MobileMenu';
 export { default as SuggestEditButton } from './SuggestEditButton';
 export { default as SuggestEditForm } from './SuggestEditForm';
+export { default as Timeline } from './Timeline';
 export { drawTreeIllustration, type TreeIllustrationOptions } from './TreeIllustration';

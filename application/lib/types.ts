@@ -7,6 +7,38 @@ export type RelatedPerson = {
   lastName?: string;
 };
 
+// Life event types
+export type LifeEvent = {
+  id: string;
+  type:
+    | 'birth'
+    | 'death'
+    | 'burial'
+    | 'baptism'
+    | 'residence'
+    | 'occupation'
+    | 'immigration'
+    | 'military'
+    | 'other';
+  date?: string;
+  place?: string;
+  description?: string;
+  orderIndex: number;
+};
+
+// Family (marriage) type
+export type Family = {
+  id: string;
+  spouseId?: string;
+  spouseName?: string;
+  spouse?: RelatedPerson; // Populated when fetching with relationships
+  marriageDate?: string;
+  marriagePlace?: string;
+  divorceDate?: string;
+  children: RelatedPerson[]; // Children from this specific marriage
+  orderIndex: number;
+};
+
 // Shared Person type - matches the scraper schema
 export type Person = {
   id: string;
@@ -39,6 +71,8 @@ export type PersonWithRelations = Omit<Person, 'father' | 'mother' | 'spouses' |
   mother?: RelatedPerson;
   spouses: RelatedPerson[];
   children: RelatedPerson[];
+  events: LifeEvent[]; // All life events
+  families: Family[]; // All marriages/families
 };
 
 export type TreeNode = {
