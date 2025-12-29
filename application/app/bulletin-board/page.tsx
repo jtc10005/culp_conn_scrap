@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/auth';
 import AuthModal from '@/components/AuthModal';
 import { getSupabaseClient } from '@/lib';
@@ -36,7 +36,7 @@ export default function BulletinBoardPage() {
     apple: false,
   });
   const [newPostCategory, setNewPostCategory] = useState('question');
-  const supabase = getSupabaseClient();
+  const supabase = useMemo(() => getSupabaseClient(), []);
 
   const loadPosts = async () => {
     setLoading(true);

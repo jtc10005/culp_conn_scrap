@@ -49,7 +49,7 @@
 2. Enable **Google**
 3. Go to [Google Cloud Console](https://console.cloud.google.com)
 4. Create OAuth 2.0 credentials
-5. Add authorized redirect URI: `https://[YOUR-PROJECT].supabase.co/auth/v1/callback`
+5. Add authorized redirect URI: `https://tygrhzeshzlcpwihrbnt.supabase.co/auth/v1/callback`
 6. Copy Client ID and Client Secret to Supabase
 
 #### Facebook OAuth:
@@ -58,7 +58,7 @@
 2. Enable **Facebook**
 3. Go to [Facebook Developers](https://developers.facebook.com)
 4. Create an app
-5. Add redirect URI: `https://[YOUR-PROJECT].supabase.co/auth/v1/callback`
+5. Add redirect URI: `https://tygrhzeshzlcpwihrbnt.supabase.co/auth/v1/callback`
 6. Copy App ID and App Secret to Supabase
 
 #### Twitter/X OAuth:
@@ -67,7 +67,7 @@
 2. Enable **Twitter**
 3. Go to [Twitter Developer Portal](https://developer.twitter.com)
 4. Create an app with OAuth 2.0
-5. Add callback URL: `https://[YOUR-PROJECT].supabase.co/auth/v1/callback`
+5. Add callback URL: `https://tygrhzeshzlcpwihrbnt.supabase.co/auth/v1/callback`
 6. Copy API Key and Secret to Supabase
 
 #### Apple OAuth:
@@ -77,7 +77,7 @@
 3. Go to [Apple Developer](https://developer.apple.com)
 4. Create a Service ID
 5. Configure Sign in with Apple
-6. Add redirect URI: `https://[YOUR-PROJECT].supabase.co/auth/v1/callback`
+6. Add redirect URI: `https://tygrhzeshzlcpwihrbnt.supabase.co/auth/v1/callback`
 7. Copy Service ID and Key to Supabase
 
 ### Step 3: Enable Bulletin Board in ConfigCat (Optional)
@@ -118,6 +118,7 @@ Control which social login options are displayed on the bulletin board:
    ```
 
 **Notes:**
+
 - Set any provider to `true` to show that login button
 - All providers default to `false` until you configure OAuth in Supabase (Step 2)
 - The social login section is completely hidden when all providers are `false`
