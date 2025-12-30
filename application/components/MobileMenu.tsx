@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/lib/auth';
 
 interface MobileMenuProps {
   navConfig: {
@@ -17,6 +18,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ navConfig, navLinkFontClasses }: MobileMenuProps) {
+  const { user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -215,6 +217,40 @@ export default function MobileMenu({ navConfig, navLinkFontClasses }: MobileMenu
               />
             </div>
           </button>
+
+          {/* Sign Out (if user is logged in) */}
+          {user && (
+            <>
+              <div className="my-2 theme-border-dark border-t"></div>
+              <button
+                onClick={async () => {
+                  try {
+                    await signOut();
+                    closeMenu();
+                  } catch (error) {
+                    console.error('Error signing out:', error);
+                  }
+                }}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:theme-bg-tertiary transition-colors text-left"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5 theme-text-primary"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+                  />
+                </svg>
+                <span className="text-sm theme-text-primary">Sign Out</span>
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

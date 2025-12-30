@@ -9,4 +9,5 @@ export { default as MobileMenu } from './MobileMenu';
 export { default as SuggestEditButton } from './SuggestEditButton';
 export { default as SuggestEditForm } from './SuggestEditForm';
 export { default as Timeline } from './Timeline';
+export { default as UserMenu } from './UserMenu';
 export { drawTreeIllustration, type TreeIllustrationOptions } from './TreeIllustration';

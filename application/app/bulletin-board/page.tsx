@@ -36,6 +36,7 @@ export default function BulletinBoardPage() {
     apple: false,
   });
   const [newPostCategory, setNewPostCategory] = useState('question');
+  const [newPostTags, setNewPostTags] = useState<string>('');
   const supabase = useMemo(() => getSupabaseClient(), []);
 
   const loadPosts = async () => {
@@ -73,20 +74,24 @@ export default function BulletinBoardPage() {
       setShowAuthModal(true);
       return;
     }
-
+    const tagsArray = newPostTags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
     const { error } = await supabase.from('bulletin_posts').insert({
       author_id: user.id,
       title: newPostTitle,
       content: newPostContent,
       category: newPostCategory,
+      tags: tagsArray.length > 0 ? tagsArray : null,
     });
-
     if (error) {
       console.error('Error creating post:', error);
       alert('Failed to create post');
     } else {
       setNewPostTitle('');
       setNewPostContent('');
+      setNewPostTags('');
       setShowNewPostForm(false);
       loadPosts();
     }
@@ -199,6 +204,17 @@ export default function BulletinBoardPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium mb-1 theme-text-primary">Tags</label>
+                <input
+                  type="text"
+                  value={newPostTags}
+                  onChange={(e) => setNewPostTags(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 theme-bg-tertiary theme-border theme-text-primary"
+                  placeholder="Comma-separated, e.g. genealogy, DNA, reunion"
+                />
+              </div>
+
               <div className="flex gap-3">
                 <button
                   type="submit"
@@ -212,6 +228,7 @@ export default function BulletinBoardPage() {
                     setShowNewPostForm(false);
                     setNewPostTitle('');
                     setNewPostContent('');
+                    setNewPostTags('');
                   }}
                   className="theme-bg-tertiary hover:opacity-80 font-medium px-6 py-2 rounded-lg theme-text-primary"
                 >

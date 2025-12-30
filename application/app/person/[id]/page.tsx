@@ -107,17 +107,17 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
             (person.militaryService && person.militaryService.length > 0)) && (
             <div className="mb-6 flex flex-wrap gap-2">
               {person.dnaProven && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-300">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-300 dark:border-green-700">
                   🧬 DNA Proven
                 </span>
               )}
               {person.hasPicture && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-300">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-700">
                   📷 Picture Available
                 </span>
               )}
               {person.hasFamilyBible && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-300">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 border border-purple-300 dark:border-purple-700">
                   📖 Family Bible Record
                 </span>
               )}
@@ -125,7 +125,7 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
                 person.militaryService.map((service) => (
                   <span
                     key={service}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-300"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-700"
                   >
                     🎖️ {service}
                   </span>
