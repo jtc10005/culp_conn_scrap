@@ -37,7 +37,7 @@ export default function AuthModal({ onClose, loginMethods }: AuthModalProps) {
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'twitter' | 'apple') => {
+  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'x' | 'apple') => {
     setError('');
     setLoading(true);
     try {
@@ -175,7 +175,7 @@ export default function AuthModal({ onClose, loginMethods }: AuthModalProps) {
 
               {loginMethods?.X && (
                 <button
-                  onClick={() => handleSocialLogin('twitter')}
+                  onClick={() => handleSocialLogin('x')}
                   disabled={loading}
                   className="flex items-center justify-center px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
                 >

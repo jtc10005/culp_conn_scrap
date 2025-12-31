@@ -61,14 +61,14 @@
 5. Add redirect URI: `https://tygrhzeshzlcpwihrbnt.supabase.co/auth/v1/callback`
 6. Copy App ID and App Secret to Supabase
 
-#### Twitter/X OAuth:
+#### X (Twitter) OAuth:
 
 1. Supabase Dashboard → **Authentication** → **Providers**
-2. Enable **Twitter**
+2. Enable **X** (not the deprecated Twitter)
 3. Go to [Twitter Developer Portal](https://developer.twitter.com)
 4. Create an app with OAuth 2.0
 5. Add callback URL: `https://tygrhzeshzlcpwihrbnt.supabase.co/auth/v1/callback`
-6. Copy API Key and Secret to Supabase
+6. Copy Client ID and Client Secret to Supabase
 
 #### Apple OAuth:
 

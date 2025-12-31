@@ -31,12 +31,12 @@ export interface LoginMethodsConfig {
 
 // Default navigation config (fallback if ConfigCat fails)
 const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
-  tree: true,
+  tree: false,
   history: true,
   people: true,
   bulletinBoard: true,
   acknowledgements: true,
-  practice: true,
+  practice: false,
   about: false,
 };
 
@@ -61,6 +61,9 @@ export async function getNavigationConfig(): Promise<NavigationConfig> {
     );
 
     // Parse the JSON string
+    if (!configText || typeof configText !== 'string' || configText.trim() === '') {
+      return DEFAULT_NAVIGATION_CONFIG;
+    }
     const config = JSON.parse(configText as string);
     return config as NavigationConfig;
   } catch (error) {
