@@ -1,11 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { BackButton, SuggestEditButton, Timeline } from '@/components';
-import {
-  getEditPersonRecordEnabled,
-  getCulpepperConnectionLinkEnabled,
-  getDebugLoggingEnabled,
-} from '@/lib';
+import { getEditPersonRecordEnabled, getCulpepperConnectionLinkEnabled } from '@/lib';
 import type { LifeEvent, Family } from '@/lib/types';
 
 // Force dynamic rendering for this page
@@ -56,7 +52,7 @@ function formatPersonName(person: RelatedPerson): string {
   return person.name;
 }
 
-async function getPerson(id: string, debugEnabled: boolean): Promise<Person | null> {
+async function getPerson(id: string): Promise<Person | null> {
   try {
     // Determine the base URL based on environment
     // Priority: NEXT_PUBLIC_BASE_URL (if set) > VERCEL_URL > localhost
@@ -65,77 +61,38 @@ async function getPerson(id: string, debugEnabled: boolean): Promise<Person | nu
     if (process.env.NEXT_PUBLIC_BASE_URL) {
       // Use explicitly set base URL first (most reliable for production)
       baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-      if (debugEnabled) {
-        console.log('[DEBUG] Using NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
-      }
     } else if (process.env.VERCEL_URL) {
       // Fallback to Vercel's auto-provided URL
       baseUrl = `https://${process.env.VERCEL_URL}`;
-      if (debugEnabled) {
-        console.log('[DEBUG] Using VERCEL_URL:', process.env.VERCEL_URL);
-      }
     } else {
       // Local development
       baseUrl = 'http://localhost:3000';
-      if (debugEnabled) {
-        console.log('[DEBUG] Using localhost fallback');
-      }
-    }
-
-    if (debugEnabled) {
-      console.log('[DEBUG] Environment variables:', {
-        NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-        VERCEL_URL: process.env.VERCEL_URL,
-        NODE_ENV: process.env.NODE_ENV,
-      });
-      console.log('[DEBUG] Fetching from:', `${baseUrl}/api/person/${id}`);
     }
 
     const res = await fetch(`${baseUrl}/api/person/${id}`, {
       cache: 'no-store',
     });
 
-    if (debugEnabled) {
-      console.log('[DEBUG] Response status:', res.status);
-      console.log('[DEBUG] Response ok:', res.ok);
-    }
-
     if (!res.ok) {
-      if (debugEnabled) {
-        console.log('[DEBUG] Response not ok, returning null');
-      }
+      console.error(`Failed to fetch person ${id}: ${res.status} ${res.statusText}`);
       return null;
     }
 
     const data = await res.json();
-
-    if (debugEnabled) {
-      console.log('[DEBUG] Data received:', !!data.person);
-    }
-
     return data.person;
   } catch (error) {
-    console.error('[ERROR] Error fetching person:', error);
+    console.error('Error fetching person:', error);
     return null;
   }
 }
 
 export default async function PersonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const debugEnabled = await getDebugLoggingEnabled();
-  const person = await getPerson(id, debugEnabled);
+  const person = await getPerson(id);
   const editEnabled = await getEditPersonRecordEnabled();
   const culpepperLinkEnabled = await getCulpepperConnectionLinkEnabled();
 
-  if (debugEnabled) {
-    console.log('[DEBUG] PersonPage rendered for id:', id);
-    console.log('[DEBUG] Person found:', !!person);
-  }
-
   if (!person) {
-    if (debugEnabled) {
-      console.log('[DEBUG] Person not found, calling notFound()');
-    }
     notFound();
   }
 
