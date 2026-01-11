@@ -133,6 +133,14 @@ export async function getCulpepperConnectionLinkEnabled(): Promise<boolean> {
 }
 
 /**
+ * Get debug logging feature flag
+ * Controls whether to enable verbose logging for troubleshooting
+ */
+export async function getDebugLoggingEnabled(): Promise<boolean> {
+  return getFeatureFlag('debugLogging', false);
+}
+
+/**
  * Close ConfigCat client (call on app shutdown)
  */
 export function closeConfigCat() {
