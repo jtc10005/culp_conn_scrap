@@ -1,6 +1,7 @@
 # Person Page 404 Troubleshooting Guide
 
 ## Current Status
+
 After implementing fixes, person detail pages still return 404 in production.
 
 ## Steps to Debug and Fix
@@ -14,6 +15,7 @@ After implementing fixes, person detail pages still return 404 in production.
 5. Look for errors in the logs for `/person/[id]`
 
 **What to look for:**
+
 - "Error fetching person" messages
 - Database connection errors
 - Environment variable missing errors
@@ -47,7 +49,8 @@ Visit: `https://culpepper.info/api/person/1`
 ### Step 4: Check Build Output
 
 In Vercel Deployment → Build Logs, look for:
-- Lines mentioning "person/[id]" 
+
+- Lines mentioning "person/[id]"
 - Any errors during route compilation
 - Warnings about dynamic routes
 
@@ -73,6 +76,7 @@ In Vercel Deployment → Build Logs, look for:
 If still failing, let's test if dynamic routes work at all. Create a test file:
 
 **File:** `app/test/[id]/page.tsx`
+
 ```typescript
 export const dynamic = 'force-dynamic';
 
@@ -89,18 +93,23 @@ Deploy and test: `https://culpepper.info/test/123`
 ## Common Issues and Solutions
 
 ### Issue: VERCEL_URL not available during build
+
 **Solution:** Use `NEXT_PUBLIC_BASE_URL` explicitly in Vercel env vars
 
 ### Issue: Database connection timeout
+
 **Solution:** Check that Neo4j and Supabase are accessible from Vercel's servers
 
 ### Issue: Route not found in build output
+
 **Solution:** Ensure `app/person/[id]/page.tsx` exists and exports a default component
 
 ### Issue: Page tries to statically generate at build time
+
 **Solution:** Verify `export const dynamic = 'force-dynamic';` is in the file
 
 ### Issue: Fetch fails with CORS or network error
+
 **Solution:** Use server-side data fetching, not client-side
 
 ## Alternative: Direct Database Access

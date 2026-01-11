@@ -33,10 +33,12 @@
 Visit: `https://culpepper.info/api/person/1`
 
 **If you get JSON data back:**
+
 - The API works, issue is with the page component
 - Check Vercel function logs for the page function
 
 **If you get 404 or error:**
+
 - The API route itself isn't working
 - Check Neo4j and Supabase connections
 - Verify all database environment variables are set
@@ -59,6 +61,7 @@ Visit: `https://culpepper.info/api/person/1`
 ## What the Console Logs Will Show
 
 In Vercel function logs, you should see:
+
 ```
 Fetching from: https://culpepper.info/api/person/1
 Response status: 200
@@ -78,6 +81,7 @@ Based on typical Vercel + Next.js issues, the most likely causes are:
 ## Alternative Solution (If Above Doesn't Work)
 
 I can refactor the code to:
+
 - Skip the internal API call
 - Fetch directly from Neo4j/Supabase in the page component
 - This is actually the recommended Next.js App Router pattern

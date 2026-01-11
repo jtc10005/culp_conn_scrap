@@ -6,6 +6,9 @@ import type { LifeEvent, Family } from '@/lib/types';
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
+export const runtime = 'nodejs';
 
 type RelatedPerson = {
   id: string;
@@ -53,7 +56,7 @@ async function getPerson(id: string): Promise<Person | null> {
   try {
     // Determine the base URL based on environment
     let baseUrl: string;
-    
+
     if (process.env.VERCEL_URL) {
       // Vercel deployment
       baseUrl = `https://${process.env.VERCEL_URL}`;
@@ -64,15 +67,15 @@ async function getPerson(id: string): Promise<Person | null> {
       // Local development
       baseUrl = 'http://localhost:3000';
     }
-    
+
     console.log('Fetching from:', `${baseUrl}/api/person/${id}`);
-    
+
     const res = await fetch(`${baseUrl}/api/person/${id}`, {
       cache: 'no-store',
     });
-    
+
     console.log('Response status:', res.status);
-    
+
     if (!res.ok) return null;
     const data = await res.json();
     return data.person;

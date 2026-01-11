@@ -5,6 +5,7 @@
 To make the person detail pages work correctly in production, you need to set the following environment variable in your Vercel project settings:
 
 ### 1. Go to Vercel Dashboard
+
 1. Navigate to your project: https://vercel.com/dashboard
 2. Select your project (culpepper.info)
 3. Go to **Settings** → **Environment Variables**
@@ -31,6 +32,7 @@ Make sure these are also set in Vercel:
 ### 4. Redeploy
 
 After adding/updating environment variables:
+
 1. Go to the **Deployments** tab
 2. Find your latest deployment
 3. Click the three dots menu (•••)
