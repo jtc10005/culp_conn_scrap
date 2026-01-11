@@ -51,18 +51,33 @@ function formatPersonName(person: RelatedPerson): string {
 
 async function getPerson(id: string): Promise<Person | null> {
   try {
-    // Use VERCEL_URL or NEXT_PUBLIC_BASE_URL for production, localhost for development
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
+    // Determine the base URL based on environment
+    let baseUrl: string;
+    
+    if (process.env.VERCEL_URL) {
+      // Vercel deployment
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    } else if (process.env.NEXT_PUBLIC_BASE_URL) {
+      // Custom base URL
+      baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    } else {
+      // Local development
+      baseUrl = 'http://localhost:3000';
+    }
+    
+    console.log('Fetching from:', `${baseUrl}/api/person/${id}`);
+    
     const res = await fetch(`${baseUrl}/api/person/${id}`, {
       cache: 'no-store',
     });
+    
+    console.log('Response status:', res.status);
+    
     if (!res.ok) return null;
     const data = await res.json();
     return data.person;
-  } catch {
+  } catch (error) {
+    console.error('Error fetching person:', error);
     return null;
   }
 }
