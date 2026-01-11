@@ -4,6 +4,9 @@ import { BackButton, SuggestEditButton, Timeline } from '@/components';
 import { getEditPersonRecordEnabled, getCulpepperConnectionLinkEnabled } from '@/lib';
 import type { LifeEvent, Family } from '@/lib/types';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 type RelatedPerson = {
   id: string;
   name: string;
@@ -48,12 +51,14 @@ function formatPersonName(person: RelatedPerson): string {
 
 async function getPerson(id: string): Promise<Person | null> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/person/${id}`,
-      {
-        cache: 'no-store',
-      }
-    );
+    // Use VERCEL_URL or NEXT_PUBLIC_BASE_URL for production, localhost for development
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+    const res = await fetch(`${baseUrl}/api/person/${id}`, {
+      cache: 'no-store',
+    });
     if (!res.ok) return null;
     const data = await res.json();
     return data.person;
