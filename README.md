@@ -18,6 +18,7 @@ culp_conn_scrap/
 │   ├── app/              # Next.js app directory
 │   ├── components/       # React components
 │   ├── lib/              # Utilities and Neo4j client
+│   ├── documentation/    # Project documentation
 │   └── package.json      # Website dependencies
 │
 ├── shared/               # Shared types between scraper and website
@@ -29,12 +30,15 @@ culp_conn_scrap/
 ## 🛠️ Projects
 
 ### Scraper (`/scraper`)
+
 TypeScript-based web scraper that:
+
 - Crawls culpepperconnections.com
 - Extracts genealogy data (names, dates, relationships)
 - Saves to Neo4j graph database
 
 **Run the scraper:**
+
 ```bash
 cd scraper
 npm install
@@ -42,13 +46,18 @@ npm run scrape
 ```
 
 ### Website (`/application`)
+
 Next.js TypeScript application that:
+
 - Displays interactive family tree visualization
 - Queries Neo4j database
 - Provides search and filtering
 - Hosted on Vercel at culpepper.info
 
+📚 **Full documentation**: See [`application/documentation/`](./application/documentation/)
+
 **Run locally:**
+
 ```bash
 cd application
 npm install
