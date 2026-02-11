@@ -66,21 +66,20 @@ export function extractPersonLinks(
     if (!href) return;
 
     // Match various formats: page.htm#anchor, #anchor, page.htm
-    const match = href.match(/([^#]+)?#?(\w+)?/);
-    if (!match) return;
+    // Ensure at least page or anchor is present
+    const match = href.match(/^([^#]+\.html?)?(?:#(\w+))?$/i);
+    if (!match || (!match[1] && !match[2])) return; // Skip if neither page nor anchor
 
     const page = match[1] || "";
     const anchor = match[2] || "";
 
-    if (page || anchor) {
-      // Generate a unique ID from page and anchor
-      const id = anchor || page.replace(/\.(htm|html)/, "");
-      links.push({
-        page: page || "master_index.htm",
-        id,
-        anchor,
-      });
-    }
+    // Generate a unique ID from page and anchor
+    const id = anchor || page.replace(/\.(htm|html)$/i, "");
+    links.push({
+      page: page || "master_index.htm",
+      id,
+      anchor,
+    });
   });
 
   return links;
@@ -337,15 +336,12 @@ export function parseRootsWebMasterIndex(html: string): QueueItem[] {
     const href = $(element).attr("href");
     if (!href) return;
 
-    // Look for links to person pages
-    const match = href.match(/([^#]+)?#?(\w+)?/);
-    if (!match) return;
+    // Look for links to person pages with proper format
+    const match = href.match(/^([^#]+\.html?)?(?:#(\w+))?$/i);
+    if (!match || (!match[1] && !match[2])) return; // Skip if neither page nor anchor
 
     const page = match[1] || "";
     const anchor = match[2] || "";
-
-    // Skip non-HTML links
-    if (page && !page.match(/\.(htm|html)$/i)) return;
 
     if (page || anchor) {
       queue.push({
