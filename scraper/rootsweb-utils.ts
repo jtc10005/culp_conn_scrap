@@ -235,9 +235,17 @@ export function parseRootsWebPersonFromPage(
   // Extract links to related people (spouses, children, parents)
   const links = extractPersonLinks($, personSection);
 
-  // Look for spouse links (commonly in sections with "married", "spouse", etc.)
-  const spouseSection = personSection.find(":contains('Spouse'), :contains('Married')");
-  const spouseLinks = extractPersonLinks($, spouseSection);
+  // Look for spouse links by finding h2/h3 headers and their following siblings
+  let spouseLinks: ReturnType<typeof extractPersonLinks> = [];
+  personSection.find("h2, h3").each((_idx, el) => {
+    const headerText = $(el).text().toLowerCase();
+    if (headerText.includes("spouse") || headerText.includes("married")) {
+      // Get the next sibling (usually a ul or p)
+      const nextSibling = $(el).next();
+      const elemLinks = extractPersonLinks($, nextSibling);
+      spouseLinks = [...spouseLinks, ...elemLinks];
+    }
+  });
   
   for (const link of spouseLinks) {
     if (link.id && link.id !== personId) {
@@ -248,9 +256,16 @@ export function parseRootsWebPersonFromPage(
     }
   }
 
-  // Look for children links
-  const childrenSection = personSection.find(":contains('Children'), :contains('Child')");
-  const childLinks = extractPersonLinks($, childrenSection);
+  // Look for children links by finding headers and their following siblings
+  let childLinks: ReturnType<typeof extractPersonLinks> = [];
+  personSection.find("h2, h3").each((_idx, el) => {
+    const headerText = $(el).text().toLowerCase();
+    if (headerText.includes("children") || headerText.includes("child")) {
+      const nextSibling = $(el).next();
+      const elemLinks = extractPersonLinks($, nextSibling);
+      childLinks = [...childLinks, ...elemLinks];
+    }
+  });
   
   for (const link of childLinks) {
     if (link.id && link.id !== personId) {
@@ -261,17 +276,25 @@ export function parseRootsWebPersonFromPage(
     }
   }
 
-  // Look for parent links
-  const parentSection = personSection.find(":contains('Father'), :contains('Mother'), :contains('Parents')");
-  const parentLinks = extractPersonLinks($, parentSection);
+  // Look for parent links by finding headers and their following siblings
+  let parentLinks: ReturnType<typeof extractPersonLinks> = [];
+  personSection.find("h2, h3").each((_idx, el) => {
+    const headerText = $(el).text().toLowerCase();
+    if (headerText.includes("father") || headerText.includes("mother") || headerText.includes("parents")) {
+      const nextSibling = $(el).next();
+      const elemLinks = extractPersonLinks($, nextSibling);
+      parentLinks = [...parentLinks, ...elemLinks];
+    }
+  });
   
   for (const link of parentLinks) {
     if (link.id && link.id !== personId) {
       // Try to determine if it's father or mother from context
-      const linkText = $(link).text().toLowerCase();
-      if (linkText.includes("father") || linkText.includes("dad")) {
+      const linkEl = personSection.find(`a[href*="${link.anchor}"]`);
+      const linkContext = linkEl.closest("li, p").text().toLowerCase();
+      if (linkContext.includes("father") || linkContext.includes("dad")) {
         person.father = link.id;
-      } else if (linkText.includes("mother") || linkText.includes("mom")) {
+      } else if (linkContext.includes("mother") || linkContext.includes("mom")) {
         person.mother = link.id;
       }
       

@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { createClient } from "@supabase/supabase-js";
 import {
   parseRootsWebPersonFromPage,
+  parseRootsWebMasterIndex,
   type Person,
   type QueueItem,
   type LifeEvent,
@@ -320,10 +321,24 @@ async function crawl() {
   const session = driver.session({ database: config.NEO4J_DATABASE });
   const visited = new Set<string>();
 
-  // Start with master index
-  const queue: QueueItem[] = [{ page: "master_index.htm", anchor: "" }];
+  // First, load the master index to get all person links
+  console.log("📖 Loading master index...\n");
+  const masterIndexHtml = await fetchPage("master_index.htm");
+  
+  if (!masterIndexHtml) {
+    console.error("❌ Failed to load master index");
+    return;
+  }
+
+  // Parse master index to get all person pages
+  const indexLinks = parseRootsWebMasterIndex(masterIndexHtml);
+  console.log(`✓ Found ${indexLinks.length} person links in master index\n`);
+
+  // Start queue with person pages from master index
+  const queue: QueueItem[] = indexLinks.filter(link => link.page !== "master_index.htm");
 
   const pageCache = new Map<string, string>();
+  pageCache.set("master_index.htm", masterIndexHtml); // Cache the master index
 
   const batch: Array<{
     person: Person;
