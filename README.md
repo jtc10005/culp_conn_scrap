@@ -6,9 +6,11 @@ This monorepo contains two projects for the Culpepper family genealogy website:
 
 ```
 culp_conn_scrap/
-├── scraper/              # Data scraping tool
-│   ├── scraper.ts        # Main crawler
+├── scraper/              # Data scraping tools
+│   ├── scraper.ts        # Culpepper Connections crawler
+│   ├── rootsweb-scraper.ts    # RootsWeb crawler
 │   ├── utils.ts          # Helper functions
+│   ├── rootsweb-utils.ts      # RootsWeb parser utilities
 │   ├── converter.ts      # Data conversion utilities
 │   ├── package.json      # Scraper dependencies
 │   ├── tsconfig.json     # TypeScript config
@@ -24,6 +26,8 @@ culp_conn_scrap/
 ├── shared/               # Shared types between scraper and website
 │
 ├── data/                 # Cached HTML files (gitignored)
+│   ├── culpepper/        # Culpepper Connections HTML
+│   └── rootsweb/         # RootsWeb HTML files
 └── README.md             # This file
 ```
 
@@ -31,19 +35,29 @@ culp_conn_scrap/
 
 ### Scraper (`/scraper`)
 
-TypeScript-based web scraper that:
+TypeScript-based web scrapers that:
 
-- Crawls culpepperconnections.com
-- Extracts genealogy data (names, dates, relationships)
-- Saves to Neo4j graph database
+- Crawl culpepperconnections.com and RootsWeb genealogy pages
+- Extract genealogy data (names, dates, relationships)
+- Save to Neo4j graph database
 
-**Run the scraper:**
+**Run the Culpepper Connections scraper:**
 
 ```bash
 cd scraper
 npm install
 npm run scrape
 ```
+
+**Run the RootsWeb scraper:**
+
+```bash
+cd scraper
+npm install
+npm run scrape:rootsweb
+```
+
+Note: RootsWeb has been offline since 2020. The RootsWeb scraper can work with archived HTML files in local storage.
 
 ### Website (`/application`)
 
