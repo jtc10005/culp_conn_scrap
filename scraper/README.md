@@ -1,6 +1,14 @@
-"# Culpepper Connections Scraper
+# Genealogy Scrapers
 
+This directory contains web scrapers that fetch genealogy data from multiple sources and save to Neo4j.
+
+## Available Scrapers
+
+### 1. Culpepper Connections Scraper (`scraper.ts`)
 Live web scraper that fetches genealogy data from CulpepperConnections.com and saves directly to Neo4j.
+
+### 2. RootsWeb Scraper (`rootsweb-scraper.ts`)
+Scraper for RootsWeb genealogy pages (freepages.rootsweb.com). Can work with local HTML files or live web pages.
 
 ## Features
 
@@ -38,11 +46,27 @@ Edit `env.json` to configure the scraper:
 
 ## Usage
 
-### Run the Scraper
+### Run the Culpepper Connections Scraper
 
 ```bash
 npm run scrape
 ```
+
+### Run the RootsWeb Scraper
+
+```bash
+npm run scrape:rootsweb
+```
+
+**Note:** RootsWeb has been offline since 2020. The scraper supports two modes:
+1. **Local files mode** (default): Reads HTML files from `data/rootsweb/` directory
+2. **Live web mode**: Fetches from the website when it's available (set `USE_LOCAL_FILES=false` in `rootsweb-scraper.ts`)
+
+To use local files:
+1. Download or archive RootsWeb HTML files
+2. Place them in `data/rootsweb/` directory
+3. Ensure `master_index.htm` exists as the starting point
+4. Run `npm run scrape:rootsweb`
 
 ### Find Missing Records
 
@@ -52,9 +76,20 @@ Check for people referenced but not yet scraped:
 npm run find-missing
 ```
 
-## Badge Extraction
+## Data Saved to Neo4j
 
-The scraper automatically extracts the following badges from person records:
+Each person node includes:
+
+- Basic info: name, firstName, middleName, lastName, gender
+- Life events: birth, birthPlace, death, deathPlace, burial, burialPlace
+- Marriage: marriageDate
+- **Badges** (Culpepper Connections only): dnaProven, hasPicture, hasFamilyBible, militaryService[]
+- Relationships: father, mother, spouses[], children[]
+- Source: "culpepperconnections" or "rootsweb" to track data origin
+
+## Culpepper Connections Features
+
+The Culpepper Connections scraper includes advanced features:
 
 - **DNA Proven** (🧬): `dnah.gif` icon
 - **Picture Available** (📷): `exhibitsy.gif` icon

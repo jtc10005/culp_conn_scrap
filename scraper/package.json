@@ -16,6 +16,7 @@
   "main": "index.js",
   "scripts": {
     "scrape": "cls && tsx scraper.ts",
+    "scrape:rootsweb": "cls && tsx rootsweb-scraper.ts",
     "find-missing": "cls && tsx find-missing.ts"
   },
   "dependencies": {
